@@ -1,4 +1,7 @@
-// Híbrido - cliente.js
+// ==============================
+// cliente.js HÍBRIDO - Nail Dreams
+// ==============================
+
 const params = new URLSearchParams(window.location.search);
 const atendimentoId = params.get("id");
 
@@ -40,46 +43,67 @@ function renderizarTela(item) {
   // Limpar os botões antes de renderizar
   clienteActions.innerHTML = "";
 
-  if (item.tipoAtendimento === "Agendado") {
-    // --- Cliente agendado ---
+  // ------------------------
+  // Cliente Agendada
+  if (item.status === "Agendado") {
     contadorBox.innerHTML = `<strong style="font-size: 68px;">❤️</strong>`;
     statusTitulo.textContent = "Seu horário está confirmado. Prepare-se para uma experiência incrível! 💅";
     horarioBox.querySelector("span").textContent = "Horário agendado";
     horarioEl.textContent = item.horarioEstimado || "--:--";
 
-    // Botões: Instagram e Google
+    // Botões: Instagram e Reagendar
     clienteActions.innerHTML = `
-      <button type="button" class="btn-reagendar" onclick="abrirInstagram()">Instagram</button>
-      <button type="button" class="btn-cancelar" onclick="abrirGoogle()">Avaliar no Google</button>
+      <button type="button" class="btn-instagram" onclick="abrirInstagram()">Instagram</button>
+      <button type="button" class="btn-reagendar" onclick="abrirGoogle()">Avaliar no Google</button>
     `;
-  }  else if (item.status === "Ausente") {
-  // Esconder elementos que não se aplicam
-  document.querySelector(".cliente-info").style.display = "none";
-  document.querySelector(".contador-box").style.display = "block"; // só para emoji
-  const clienteActions = document.querySelector(".cliente-actions");
-  const statusTitulo = document.getElementById("statusTitulo");
+  }
+  // ------------------------
+  // Cliente Ausente
+  else if (item.status === "Ausente") {
+    // Oculta info que não é relevante
+    document.querySelector(".cliente-info").style.display = "none";
 
-  // Emoji de tristeza
-  document.querySelector(".contador-box").innerHTML = `<div class="emoji-container">😢</div>`;
+    // Emoji centralizado e maior
+    contadorBox.innerHTML = `<div class="emoji-container" style="font-size:80px;">😢</div>`;
 
-  // Frase principal
-  statusTitulo.textContent = "Sentimos sua ausência. Ficamos tristes por não vê-la hoje, mas teremos prazer em atendê-la em outro momento!";
+    statusTitulo.textContent = "Sentimos sua ausência. Ficamos tristes por não vê-la hoje, mas teremos prazer em atendê-la em outro momento!";
 
-  // Botões Instagram + Reagendar
-clienteActions.innerHTML = `
-  <a href="https://www.instagram.com/naildreams.bsb/" target="_blank" class="btn-instagram">Instagram</a>
-  <button class="btn-reagendar" onclick="reagendarAusente('${item.id}')">Reagendar</button>
-`;
+    // Botões Instagram e Reagendar
+    clienteActions.innerHTML = `
+      <button type="button" class="btn-instagram" onclick="abrirInstagram()">Instagram</button>
+      <button type="button" class="btn-reagendar" onclick="reagendarAusente('${item.id}')">Reagendar</button>
+    `;
+  }
+  // ------------------------
+  // Fila de Espera
+  else {
+    const pessoas = item.pessoasNaFrente || 0;
+    contadorBox.style.display = "flex";
+    contadorBox.innerHTML = `<strong style="font-size: 54px;">${pessoas}</strong>
+                             <span>Pessoas à sua frente</span>`;
+    statusTitulo.textContent =
+      pessoas === 0
+        ? "Seu atendimento está próximo."
+        : "Acompanhe sua fila em tempo real.";
+    horarioBox.querySelector("span").textContent = "Tempo restante";
+    horarioEl.textContent = item.tempoRestante || "--:--";
+
+    // Botões Reagendar / Cancelar
+    clienteActions.innerHTML = `
+      <button type="button" class="btn-reagendar" onclick="abrirModalReagendar()">Reagendar</button>
+      <button type="button" class="btn-cancelar" onclick="abrirModalCancelar()">Cancelar</button>
+    `;
+  }
 }
-}
 
+// ------------------------
+// Funções gerais
 function reagendarAusente(id) {
   const numeroLoja = "5561983740873"; // WhatsApp da loja
   const mensagem = `Olá! Não pude comparecer ao meu atendimento com ID ${id}. Gostaria de reagendar, por favor.`;
   window.open(`https://wa.me/${numeroLoja}?text=${encodeURIComponent(mensagem)}`, "_blank");
 }
 
-// Funções dos botões
 function abrirInstagram() {
   window.open("https://www.instagram.com/naildreams.bsb/", "_blank");
 }
@@ -113,13 +137,9 @@ async function confirmarCancelamento() {
 }
 
 function carregarHorariosDisponiveis() {
-  const horarios = [
-    "10:00","11:00","12:00","13:00","14:00","15:00","16:00"
-  ];
-
+  const horarios = ["10:00","11:00","12:00","13:00","14:00","15:00","16:00"];
   const grid = document.getElementById("horariosGrid");
   grid.innerHTML = "";
-
   horarios.forEach(horario => {
     const button = document.createElement("button");
     button.textContent = horario;
@@ -139,7 +159,9 @@ async function solicitarReagendamento(horario) {
   }
 }
 
+// ------------------------
 // Atualiza tela a cada 15s
 setInterval(carregarAtendimento, 15000);
 
+// Inicializa ao carregar a página
 carregarAtendimento();
