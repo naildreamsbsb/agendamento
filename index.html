@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Nail Dreams</title>
+</head>
+<body>
+
+  <h1>Nail Dreams API</h1>
+
+  <button onclick="testarAPI()">Testar API</button>
+
+  <pre id="resultado"></pre>
+
+  <script src="config/config.js"></script>
+
+  <script>
+    async function testarAPI() {
+      const response = await fetch(`${API_URL}?action=ping`);
+      const data = await response.json();
+
+      document.getElementById("resultado").textContent =
+        JSON.stringify(data, null, 2);
+    }
+  </script>
+
+</body>
+</html>

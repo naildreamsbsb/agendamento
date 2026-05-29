@@ -1,0 +1,145 @@
+// Híbrido - cliente.js
+const params = new URLSearchParams(window.location.search);
+const atendimentoId = params.get("id");
+
+let atendimentoAtual = null;
+
+async function carregarAtendimento() {
+  if (!atendimentoId) return;
+
+  try {
+    const resposta = await fetch(`${API_URL}?action=buscarAtendimento&id=${atendimentoId}`);
+    const dados = await resposta.json();
+
+    if (!dados.success) return;
+
+    atendimentoAtual = dados.atendimento;
+
+    renderizarTela(atendimentoAtual);
+
+  } catch (erro) {
+    console.error(erro);
+  }
+}
+
+function renderizarTela(item) {
+  const clienteEl = document.getElementById("cliente");
+  const servicoEl = document.getElementById("servico");
+  const manicureEl = document.getElementById("manicure");
+  const horarioEl = document.getElementById("horario");
+  const contadorBox = document.querySelector(".contador-box");
+  const clienteActions = document.querySelector(".cliente-actions");
+  const statusTitulo = document.getElementById("statusTitulo");
+  const horarioBox = horarioEl.closest("div");
+
+  // Preencher dados básicos
+  clienteEl.textContent = item.cliente || "--";
+  servicoEl.textContent = item.servico || "--";
+  manicureEl.textContent = item.manicure || "--";
+
+  // Limpar os botões antes de renderizar
+  clienteActions.innerHTML = "";
+
+  if (item.tipoAtendimento === "Agendado") {
+    // --- Cliente agendado ---
+    contadorBox.innerHTML = `<strong style="font-size: 68px;">❤️</strong>`;
+    statusTitulo.textContent = "Seu horário está confirmado. Prepare-se para uma experiência incrível! 💅";
+    horarioBox.querySelector("span").textContent = "Horário agendado";
+    horarioEl.textContent = item.horarioEstimado || "--:--";
+
+    // Botões: Instagram e Google
+    clienteActions.innerHTML = `
+      <button type="button" class="btn-reagendar" onclick="abrirInstagram()">Instagram</button>
+      <button type="button" class="btn-cancelar" onclick="abrirGoogle()">Avaliar no Google</button>
+    `;
+  }  else if (item.status === "Ausente") {
+  // Esconder elementos que não se aplicam
+  document.querySelector(".cliente-info").style.display = "none";
+  document.querySelector(".contador-box").style.display = "block"; // só para emoji
+  const clienteActions = document.querySelector(".cliente-actions");
+  const statusTitulo = document.getElementById("statusTitulo");
+
+  // Emoji de tristeza
+  document.querySelector(".contador-box").innerHTML = `<div class="emoji-container">😢</div>`;
+
+  // Frase principal
+  statusTitulo.textContent = "Sentimos sua ausência. Ficamos tristes por não vê-la hoje, mas teremos prazer em atendê-la em outro momento!";
+
+  // Botões Instagram + Reagendar
+clienteActions.innerHTML = `
+  <button type="button" class="btn-instagram" onclick="abrirInstagram()">Instagram</button>
+  <button type="button" class="btn-reagendar" onclick="reagendarAusente('${item.id}')">Reagendar</button>
+`;
+}
+}
+
+function reagendarAusente(id) {
+  const numeroLoja = "5561983740873"; // WhatsApp da loja
+  const mensagem = `Olá! Não pude comparecer ao meu atendimento com ID ${id}. Gostaria de reagendar, por favor.`;
+  window.open(`https://wa.me/${numeroLoja}?text=${encodeURIComponent(mensagem)}`, "_blank");
+}
+
+// Funções dos botões
+function abrirInstagram() {
+  window.open("https://www.instagram.com/naildreams.bsb/", "_blank");
+}
+
+function abrirGoogle() {
+  window.open("https://g.page/r/CQGUQrYpI28IEAI/review", "_blank");
+}
+
+// Funções Reagendar / Cancelar fila
+function abrirModalCancelar() {
+  document.getElementById("modalCancelar").classList.add("ativo");
+}
+
+function abrirModalReagendar() {
+  document.getElementById("modalReagendar").classList.add("ativo");
+  carregarHorariosDisponiveis();
+}
+
+function fecharModais() {
+  document.querySelectorAll(".modal").forEach(modal => modal.classList.remove("ativo"));
+}
+
+async function confirmarCancelamento() {
+  try {
+    await fetch(`${API_URL}?action=atualizarStatus&id=${atendimentoId}&status=Cancelada`);
+    alert("Seu atendimento foi cancelado.");
+    window.location.reload();
+  } catch (erro) {
+    console.error(erro);
+  }
+}
+
+function carregarHorariosDisponiveis() {
+  const horarios = [
+    "10:00","11:00","12:00","13:00","14:00","15:00","16:00"
+  ];
+
+  const grid = document.getElementById("horariosGrid");
+  grid.innerHTML = "";
+
+  horarios.forEach(horario => {
+    const button = document.createElement("button");
+    button.textContent = horario;
+    button.onclick = () => solicitarReagendamento(horario);
+    grid.appendChild(button);
+  });
+}
+
+async function solicitarReagendamento(horario) {
+  try {
+    await fetch(`${API_URL}?action=reagendar&id=${atendimentoId}&horario=${horario}`);
+    alert(`Solicitação de reagendamento enviada para ${horario}.`);
+    fecharModais();
+    window.location.reload();
+  } catch (erro) {
+    console.error(erro);
+  }
+}
+
+// Atualiza tela a cada 15s
+setInterval(carregarAtendimento, 15000);
+
+carregarAtendimento();

@@ -1,0 +1,1447 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #f8f3ee, #e7ddd4);
+  color: #2b211c;
+}
+
+.container {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.logo {
+  width: 120px;
+  margin: 0 auto 28px;
+  display: block;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(115, 85, 65, 0.16);
+  border-radius: 28px;
+  padding: 32px 24px;
+  box-shadow: 0 24px 60px rgba(65, 43, 31, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #9b735e;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+h1 {
+  font-family: Georgia, serif;
+  font-size: 32px;
+  line-height: 1.08;
+  font-weight: 500;
+  color: #2b211c;
+  margin-bottom: 28px;
+}
+
+.info {
+  display: grid;
+  gap: 14px;
+}
+
+.info-item {
+  padding: 16px;
+  border-radius: 18px;
+  background: #fbf8f5;
+  border: 1px solid rgba(115, 85, 65, 0.12);
+}
+
+.info-item span {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  color: #9b735e;
+  margin-bottom: 6px;
+}
+
+.info-item strong {
+  font-size: 17px;
+  font-weight: 600;
+  color: #2b211c;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 28px 16px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .card {
+    padding: 28px 20px;
+  }
+}
+
+/* ADMIN - Nail Dreams */
+
+.admin-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 28px;
+}
+
+.admin-logo {
+  width: 86px;
+  height: 86px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 24px;
+  padding: 12px;
+  box-shadow: 0 18px 40px rgba(65, 43, 31, 0.08);
+}
+
+.admin-header h1 {
+  margin-bottom: 0;
+}
+
+.admin-card {
+  margin-bottom: 24px;
+}
+
+.admin-card h2 {
+  font-family: Georgia, serif;
+  font-size: 26px;
+  font-weight: 500;
+  color: #2b211c;
+  margin-bottom: 22px;
+}
+
+.admin-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  width: 100%;
+  border: 1px solid rgba(115, 85, 65, 0.18);
+  background: #fbf8f5;
+  color: #2b211c;
+  border-radius: 18px;
+  padding: 16px 18px;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
+  border-color: #9b735e;
+  box-shadow: 0 0 0 4px rgba(155, 115, 94, 0.12);
+  background: #fff;
+}
+
+.admin-form textarea {
+  min-height: 54px;
+  resize: vertical;
+  grid-column: span 2;
+}
+
+.admin-form button,
+.section-title button,
+.fila-actions button {
+  border: none;
+  border-radius: 999px;
+  background: #2b211c;
+  color: #fff;
+  padding: 14px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-form button {
+  grid-column: span 2;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #2b211c, #6f4e3f);
+}
+
+.admin-form button:hover,
+.section-title button:hover,
+.fila-actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(65, 43, 31, 0.18);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.filas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.fila-bloco {
+  background: #fbf8f5;
+  border: 1px solid rgba(115, 85, 65, 0.12);
+  border-radius: 24px;
+  padding: 18px;
+}
+
+.fila-bloco h3 {
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  color: #6f4e3f;
+}
+
+.fila-item {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(115, 85, 65, 0.1);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.fila-item strong {
+  display: block;
+  font-size: 16px;
+  color: #2b211c;
+  margin-bottom: 6px;
+}
+
+.fila-item span {
+  display: block;
+  font-size: 13px;
+  color: #9b735e;
+  margin-bottom: 12px;
+}
+
+.fila-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.fila-actions button {
+  width: 100%;
+  min-height: 44px;
+
+  padding: 10px 14px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  background: #6f4e3f;
+}
+
+.fila-actions button:nth-child(3) {
+  background: #2b211c;
+}
+
+.fila-actions button:nth-child(4) {
+  background: #b08a78;
+}
+
+.empty {
+  color: #9b735e;
+  font-size: 15px;
+  padding: 20px;
+}
+
+@media (max-width: 760px) {
+  .admin-header {
+    align-items: flex-start;
+  }
+
+  .admin-form,
+  .filas {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form textarea,
+  .admin-form button {
+    grid-column: span 1;
+  }
+
+  .section-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Cards premium da fila */
+
+.fila-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.fila-horario {
+  min-width: 90px;
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: #efe5dc;
+  color: #6f4e3f;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.fila-horario small {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #9b735e;
+  margin-bottom: 2px;
+}
+
+.fila-horario strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.fila-status {
+  display: inline-block;
+  margin: 10px 0 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #eadfd6;
+  color: #6f4e3f;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.fila-alerta {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #f3ece6;
+  color: #5a3f34;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.fila-item.status-aguardando {
+  border-left: 5px solid #b08a78;
+}
+
+.fila-item.status-chamada {
+  border-left: 5px solid #6f4e3f;
+}
+
+.fila-item.status-em-atendimento {
+  border-left: 5px solid #2b211c;
+}
+
+.fila-item.status-confirmou-retorno {
+  border-left: 5px solid #8a6a55;
+  background: #fffaf6;
+}
+
+.fila-item.status-antecipacao-oferecida {
+  border-left: 5px solid #c29b7b;
+}
+
+.fila-item.status-recusou-antecipacao {
+  opacity: 0.7;
+}
+
+.fila-item.status-confirmou-retorno .fila-status {
+  background: #2b211c;
+  color: #fff;
+}
+
+.fila-item.status-antecipacao-oferecida .fila-status {
+  background: #6f4e3f;
+  color: #fff;
+}
+
+.fila-item.status-em-atendimento .fila-status {
+  background: #2b211c;
+  color: #fff;
+}
+
+.fila-item.status-chamada .fila-status {
+  background: #6f4e3f;
+  color: #fff;
+}
+
+@media (max-width: 560px) {
+  .fila-topo {
+    flex-direction: column;
+  }
+
+  .fila-horario {
+    text-align: left;
+  }
+}
+
+.fila-horario small {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #9b735e;
+  margin-bottom: 2px;
+}
+
+/* Ajuste mobile premium da fila */
+
+.fila-bloco {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.fila-item {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 18px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(115, 85, 65, 0.14);
+  box-shadow: 0 14px 34px rgba(65, 43, 31, 0.08);
+}
+
+.fila-topo {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.fila-item strong {
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.fila-item span {
+  margin-top: 6px;
+  margin-bottom: 0;
+  font-size: 14px;
+  color: #9b735e;
+}
+
+.fila-horario {
+  min-width: 82px;
+  padding: 9px 12px;
+  border-radius: 18px;
+}
+
+.fila-status {
+  margin: 14px 0 12px;
+}
+
+.fila-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fila-actions button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 96px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.fila-actions::-webkit-scrollbar {
+  height: 4px;
+}
+
+.fila-actions::-webkit-scrollbar-thumb {
+  background: rgba(111, 78, 63, 0.25);
+  border-radius: 999px;
+}
+
+.filas {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+@media (min-width: 900px) {
+  .filas {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-container {
+    padding: 24px 14px;
+  }
+
+  .admin-header {
+    gap: 14px;
+  }
+
+  .admin-logo {
+    width: 68px;
+    height: 68px;
+  }
+
+  .admin-header h1 {
+    font-size: 30px;
+  }
+
+  .admin-card {
+    padding: 22px 16px;
+  }
+
+  .fila-item {
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .fila-topo {
+    grid-template-columns: 1fr auto;
+  }
+
+  .fila-horario {
+    min-width: 76px;
+  }
+
+  .fila-actions {
+    margin-left: -2px;
+    margin-right: -2px;
+  }
+}
+
+.fila-item {
+  display: none;
+}
+
+.fila-card {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 18px;
+  border-radius: 24px;
+  background: #fff;
+  border: 1px solid rgba(115, 85, 65, 0.14);
+  border-left: 5px solid #b08a78;
+  box-shadow: 0 12px 28px rgba(65, 43, 31, 0.08);
+}
+
+.fila-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.fila-card-header strong {
+  display: block;
+  font-size: 18px;
+  color: #2b211c;
+  line-height: 1.2;
+}
+
+.fila-card-header span {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  color: #9b735e;
+}
+
+.fila-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0 6px;
+}
+
+.fila-actions button {
+  flex: 0 0 auto;
+  min-width: 98px;
+  height: 42px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.fila-bloco {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+@media (max-width: 560px) {
+  .fila-card {
+    padding: 16px;
+  }
+
+  .fila-card-header {
+    gap: 10px;
+  }
+
+  .fila-horario {
+    min-width: 92px;
+  }
+}
+
+@media (max-width: 560px) {
+  .fila-card {
+    padding: 16px 14px;
+    border-radius: 22px;
+  }
+
+  .fila-card-header {
+    flex-direction: column;
+  }
+
+  .fila-horario {
+    width: 100%;
+    min-width: 0;
+    margin-top: 8px;
+  }
+
+  .fila-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    overflow-x: visible;
+    gap: 8px;
+  }
+
+  .fila-actions button {
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .fila-status {
+    width: fit-content;
+    margin: 12px 0;
+  }
+}
+
+.fila-collapse {
+  padding: 0;
+  overflow: hidden;
+}
+
+.fila-resumo {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  cursor: pointer;
+  color: #2b211c;
+}
+
+.fila-resumo span {
+  font-size: 17px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.fila-resumo strong {
+  background: #efe5dc;
+  color: #6f4e3f;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.fila-detalhes {
+  display: none;
+  padding: 0 18px 18px;
+}
+
+.fila-card.aberto .fila-detalhes {
+  display: block;
+}
+
+.fila-servico {
+  color: #9b735e;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 560px) {
+  .fila-resumo {
+    padding: 15px 14px;
+  }
+
+  .fila-detalhes {
+    padding: 0 14px 16px;
+  }
+
+  .fila-resumo span {
+    font-size: 16px;
+  }
+}
+
+/* Tela premium da cliente */
+
+.cliente-page {
+  min-height: 100vh;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f3ee, #e7ddd4);
+}
+
+.cliente-card {
+  width: 100%;
+  max-width: 420px;
+  max-height: 94vh;
+  padding: 24px 22px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(115, 85, 65, 0.14);
+  box-shadow: 0 24px 60px rgba(65, 43, 31, 0.14);
+  overflow: hidden;
+}
+
+.cliente-logo {
+  width: 78px;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+.contador-box {
+  margin: 14px auto 16px;
+  width: 150px;
+  height: 120px;
+  border-radius: 28px;
+  background: #efe5dc;
+  color: #2b211c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.contador-box strong {
+  font-size: 54px;
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.contador-box span {
+  margin-top: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #9b735e;
+  text-align: center;
+}
+
+.cliente-card h1 {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.cliente-info {
+  display: grid;
+  gap: 10px;
+}
+
+.cliente-info div {
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: #fbf8f5;
+  border: 1px solid rgba(115, 85, 65, 0.12);
+}
+
+.cliente-info span {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+  color: #9b735e;
+  margin-bottom: 4px;
+}
+
+.cliente-info strong {
+  font-size: 15px;
+  color: #2b211c;
+}
+
+.cliente-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.cliente-actions button,
+.modal-actions button,
+.horarios-grid button {
+  border: none;
+  border-radius: 999px;
+  padding: 13px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-reagendar {
+  background: #6f4e3f;
+  color: #fff;
+}
+
+.btn-cancelar {
+  background: #8f3f35;
+  color: #fff;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(43, 33, 28, 0.35);
+  backdrop-filter: blur(8px);
+}
+
+.modal.ativo {
+  display: flex;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 24px;
+  border-radius: 26px;
+  background: #fffaf6;
+  box-shadow: 0 24px 60px rgba(43, 33, 28, 0.25);
+}
+
+.modal-card h2 {
+  font-family: Georgia, serif;
+  font-size: 25px;
+  margin-bottom: 8px;
+  color: #2b211c;
+}
+
+.modal-card p {
+  color: #6f4e3f;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.modal-actions button:first-child {
+  background: #efe5dc;
+  color: #6f4e3f;
+}
+
+.horarios-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.horarios-grid button {
+  background: #efe5dc;
+  color: #6f4e3f;
+}
+
+@media (max-height: 740px) {
+  .cliente-card {
+    padding: 18px;
+  }
+
+  .cliente-logo {
+    width: 58px;
+  }
+
+  .contador-box {
+    width: 130px;
+    height: 96px;
+  }
+
+  .contador-box strong {
+    font-size: 44px;
+  }
+
+  .cliente-card h1 {
+    font-size: 21px;
+    margin-bottom: 12px;
+  }
+
+  .cliente-info div {
+    padding: 10px 12px;
+  }
+}
+
+.modal-editar-card {
+  max-width: 620px;
+}
+
+.modal-editar-card .admin-form {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.modal-actions-full {
+  grid-column: span 2;
+  justify-content: flex-end;
+}
+
+.modal-actions-full button:last-child {
+  background: linear-gradient(135deg, #2b211c, #6f4e3f);
+  color: #fff;
+}
+
+@media (max-width: 560px) {
+  .modal-editar-card {
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .modal-editar-card .admin-form {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions-full {
+    grid-column: span 1;
+  }
+}
+
+/* Correção modal editar no mobile */
+
+#modalEditar {
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 18px 12px;
+}
+
+#modalEditar .modal-card {
+  margin: 20px 0;
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  #modalEditar {
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  #modalEditar .modal-editar-card {
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+    min-height: auto;
+    padding: 20px 16px;
+    border-radius: 24px;
+  }
+
+  #modalEditar .admin-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  #modalEditar .admin-form input,
+  #modalEditar .admin-form select,
+  #modalEditar .admin-form textarea {
+    min-height: 48px;
+    font-size: 15px;
+  }
+
+  #modalEditar .modal-actions-full {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+}
+
+.fila-indicador {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 92px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #efe5dc;
+  color: #2b211c;
+  font-size: 15px;
+  line-height: 1.1;
+}
+
+.fila-indicador small {
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #9b735e;
+  margin-bottom: 3px;
+}
+
+.admin-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==============================================
+   Tela do Cliente - Híbrido (Fila + Agendado)
+   ============================================== */
+
+.cliente-page {
+  min-height: 100vh;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f3ee, #e7ddd4);
+}
+
+.cliente-card {
+  width: 100%;
+  max-width: 420px;
+  max-height: 94vh;
+  padding: 24px 22px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(115, 85, 65, 0.14);
+  box-shadow: 0 24px 60px rgba(65, 43, 31, 0.14);
+  overflow: hidden;
+}
+
+/* Logo */
+.cliente-logo {
+  width: 78px;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+/* Nome do studio */
+.eyebrow {
+  text-align: center;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #b48b73;
+  font-size: 12px;
+}
+
+/* Quadrado contador - emoji ou número */
+.contador-box {
+  width: 150px;
+  height: 150px;
+  border-radius: 28px;
+  background: #efe5dc;
+  color: #2b211c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 18px auto;
+}
+
+.contador-box strong {
+  font-size: 80px;
+  line-height: 1;
+}
+
+/* Frase principal */
+#statusTitulo {
+  text-align: center;
+  font-size: 20px;
+  margin: 20px 0 16px;
+  line-height: 1.4;
+}
+
+/* Informações básicas */
+.cliente-info {
+  display: grid;
+  gap: 10px;
+}
+
+.cliente-info div {
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: #fbf8f5;
+  border: 1px solid rgba(115, 85, 65, 0.12);
+}
+
+.cliente-info span {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+  color: #9b735e;
+  margin-bottom: 4px;
+}
+
+.cliente-info strong {
+  font-size: 15px;
+  color: #2b211c;
+}
+
+/* Ações da cliente */
+.cliente-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.btn-reagendar {
+  background: #6f4e3f;
+  color: #fff;
+  border-radius: 999px;
+  padding: 13px 14px;
+  font-weight: 700;
+}
+
+.btn-cancelar {
+  background: #8f3f35;
+  color: #fff;
+  border-radius: 999px;
+  padding: 13px 14px;
+  font-weight: 700;
+}
+
+/* Modais */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(43, 33, 28, 0.35);
+  backdrop-filter: blur(8px);
+}
+
+.modal.ativo {
+  display: flex;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 24px;
+  border-radius: 26px;
+  background: #fffaf6;
+  box-shadow: 0 24px 60px rgba(43, 33, 28, 0.25);
+}
+
+.modal-card h2 {
+  font-family: Georgia, serif;
+  font-size: 25px;
+  margin-bottom: 8px;
+  color: #2b211c;
+}
+
+.modal-card p {
+  color: #6f4e3f;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.modal-actions button:first-child {
+  background: #efe5dc;
+  color: #6f4e3f;
+}
+
+.horarios-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.horarios-grid button {
+  background: #efe5dc;
+  color: #6f4e3f;
+  border-radius: 999px;
+  padding: 10px 12px;
+  font-weight: 600;
+}
+
+/* Mobile adjustments */
+@media (max-width: 560px) {
+  .cliente-card {
+    padding: 18px 14px;
+    max-height: 90vh;
+  }
+
+  .cliente-logo {
+    width: 58px;
+  }
+
+  .contador-box {
+    width: 130px;
+    height: 130px;
+  }
+
+  .contador-box strong {
+    font-size: 72px;
+  }
+
+  .cliente-card h1 {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .cliente-info div {
+    padding: 10px 12px;
+  }
+
+  .cliente-actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+}
+
+.alerta-lembrete button {
+  background: #f5a623; /* cor de alerta elegante */
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.alerta-lembrete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  background: #fff3e0;
+  color: #a33b2c;
+  padding: 6px 10px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+
+/* Cliente Ausente */
+.cliente-card .emoji-container {
+  display: flex;
+  justify-content: center; /* centraliza horizontalmente */
+  align-items: center;     /* centraliza verticalmente */
+  font-size: 80px;         /* aumenta o tamanho do emoji */
+  margin: 20px 0;          /* espaço acima e abaixo */
+}
+
+.cliente-card .mensagem-principal {
+  text-align: center;      /* centraliza a frase */
+  font-size: 18px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.cliente-card .acoes-agendamento {
+  display: flex;
+  justify-content: center; /* centraliza os botões horizontalmente */
+  gap: 15px;               /* espaço entre os botões */
+  margin-top: 20px;
+}
+
+.cliente-card .acoes-agendamento .btn-instagram,
+.cliente-card .acoes-agendamento .btn-reagendar {
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cliente-card .acoes-agendamento .btn-instagram {
+  background-color: #6f4f3f; /* marrom do site */
+  color: #fff;
+}
+
+.cliente-card .acoes-agendamento .btn-instagram:hover {
+  background-color: #5a3f33;
+}
+
+.cliente-card .acoes-agendamento .btn-reagendar {
+  background-color: #a14b3d; /* vermelho escuro do site */
+  color: #fff;
+}
+
+.cliente-card .acoes-agendamento .btn-reagendar:hover {
+  background-color: #862f25;
+}
+
+.cliente-card .acoes-agendamento {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.cliente-card .acoes-agendamento .btn-instagram,
+.cliente-card .acoes-agendamento .btn-reagendar {
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.cliente-card .acoes-agendamento .btn-instagram {
+  background-color: #6f4f3f; /* marrom */
+  color: #fff;
+}
+
+.cliente-card .acoes-agendamento .btn-instagram:hover {
+  background-color: #5a3f33;
+}
+
+.cliente-card .acoes-agendamento .btn-reagendar {
+  background-color: #a14b3d; /* vermelho escuro */
+  color: #fff;
+}
+
+.cliente-card .acoes-agendamento .btn-reagendar:hover {
+  background-color: #862f25;
+}
+
+
+.cliente-card .acoes-agendamento {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.cliente-card .acoes-agendamento .btn-instagram,
+.cliente-card .acoes-agendamento .btn-reagendar {
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.cliente-card .acoes-agendamento .btn-instagram {
+  background-color: #6f4f3f;
+  color: #fff;
+}
+
+.cliente-card .acoes-agendamento .btn-instagram:hover {
+  background-color: #5a3f33;
+}
+
+.cliente-card .acoes-agendamento .btn-reagendar {
+  background-color: #a14b3d;
+  color: #fff;
+}
+
+.cliente-card .acoes-agendamento .btn-reagendar:hover {
+  background-color: #862f25;
+}
+
+/* Botões da página cliente */
+.cliente-card .acoes-agendamento {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* Botões Reagendar e Instagram */
+.cliente-card .acoes-agendamento .btn-reagendar,
+.cliente-card .acoes-agendamento .btn-instagram {
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Botão Instagram com cor gradient estilo Instagram */
+.cliente-card .acoes-agendamento .btn-instagram {
+  background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+  color: #fff;
+}
+
+.cliente-card .acoes-agendamento .btn-instagram:hover {
+  filter: brightness(1.1);
+}
+
+/* Botão Reagendar permanece marrom */
+.cliente-card .acoes-agendamento .btn-reagendar {
+  background-color: #6f4f3f; /* marrom do site */
+  color: #fff;
+}
+
+.cliente-card .acoes-agendamento .btn-reagendar:hover {
+  background-color: #5a3f33;
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Nail Dreams</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="admin-container">
+    <header class="admin-header">
+      <img src="assets/logo.png" alt="Nail Dreams" class="admin-logo">
+      <div>
+        <p class="eyebrow">Painel da recepção</p>
+        <h1>Fila inteligente</h1>
+      </div>
+    </header>
+
+    <section class="card admin-card">
+      <h2>Novo atendimento</h2>
+
+      <form id="formCadastro" class="admin-form">
+        <input type="text" id="cliente" placeholder="Nome da cliente" required>
+        <input type="tel" id="telefone" placeholder="WhatsApp com DDD" required>
+
+        <select id="servico" required>
+          <option value="">Selecione o serviço</option>
+        </select>
+
+        <select id="manicure" required>
+          <option value="">Selecione a manicure</option>
+        </select>
+
+        <input type="number" id="tempoUsado" placeholder="Tempo em minutos">
+        <input type="time" id="horarioManual" placeholder="Horário manual">
+
+        <select id="tipoAtendimento" required>
+          <option value="Fila de espera">Fila de espera</option>
+          <option value="Agendado">Agendado</option>
+        </select>
+
+        <select id="aceitaAntecipacao">
+          <option value="Sim">Aceita antecipação</option>
+          <option value="Não">Não aceita antecipação</option>
+        </select>
+
+        <textarea id="observacoes" placeholder="Observações"></textarea>
+
+        <button type="submit">Cadastrar atendimento</button>
+      </form>
+    </section>
+
+    <section class="card admin-card">
+      <div class="section-title">
+        <h2>Fila atual</h2>
+        <button id="btnAtualizar" type="button">Atualizar</button>
+      </div>
+
+      <div id="filas" class="filas"></div>
+    </section>
+
+    <div class="modal" id="modalEditar">
+  <div class="modal-card modal-editar-card">
+    <h2>Editar atendimento</h2>
+
+    <form id="formEditar" class="admin-form">
+      <input type="hidden" id="editId">
+
+      <input type="text" id="editCliente" placeholder="Nome da cliente" required>
+      <input type="tel" id="editTelefone" placeholder="WhatsApp com DDD" required>
+
+      <select id="editServico" required></select>
+      <select id="editManicure" required></select>
+
+      <input type="time" id="editHorario">
+      <input type="number" id="editTempoUsado" placeholder="Tempo em minutos">
+
+      <select id="editTipoAtendimento">
+        <option value="Fila de espera">Fila de espera</option>
+        <option value="Agendado">Agendado</option>
+      </select>
+
+      <select id="editAceitaAntecipacao">
+        <option value="Sim">Aceita antecipação</option>
+        <option value="Não">Não aceita antecipação</option>
+      </select>
+
+      <textarea id="editObservacoes" placeholder="Observações"></textarea>
+
+      <div class="modal-actions modal-actions-full">
+        <button type="button" onclick="fecharModalEditar()">Cancelar</button>
+        <button type="submit">Salvar alterações</button>
+      </div>
+    </form>
+  </div>
+</div>
+  </main>
+
+  <script src="config/config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
