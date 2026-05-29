@@ -67,8 +67,8 @@ function renderizarTela(item) {
 
   // Botões Instagram + Reagendar
 clienteActions.innerHTML = `
-  <button type="button" class="btn-instagram" onclick="abrirInstagram()">Instagram</button>
-  <button type="button" class="btn-reagendar" onclick="reagendarAusente('${item.id}')">Reagendar</button>
+  <a href="https://www.instagram.com/naildreams.bsb/" target="_blank" class="btn-instagram">Instagram</a>
+  <button class="btn-reagendar" onclick="reagendarAusente('${item.id}')">Reagendar</button>
 `;
 }
 }
