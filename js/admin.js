@@ -479,7 +479,13 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
       function calcularCaixa() {
         const valorAtual = normalizarValorCaixa(inputValor.value);
         const forma = selectForma.value;
-        const taxaPercentual = (forma === 'Pix' || forma === 'Dinheiro') ? 0 : 4;
+        const taxasPorForma = {
+          Pix: 0,
+          Dinheiro: 0,
+          Débito: 1.99,
+          Crédito: 4.98
+        };
+        const taxaPercentual = taxasPorForma[forma] || 0;
 
         if (!Number.isFinite(valorAtual)) {
           inputLiquido.value = "";
