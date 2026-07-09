@@ -377,7 +377,7 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
             <h2>Finalizar Atendimento - Caixa</h2>
             <form id="formCaixa" class="admin-form">
               <label>Valor</label>
-              <input type="number" id="caixaValor" value="${valorBruto}" inputmode="decimal" pattern="[0-9]*" required> <!-- valor pré-preenchido -->
+              <input type="number" id="caixaValor" value="${valorBruto}" inputmode="decimal" pattern="[0-9]*" min="0.01" step="0.01" required> <!-- valor pré-preenchido -->
               
               <label>Forma de pagamento</label>
               <select id="caixaForma" required>
@@ -406,7 +406,7 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
       const inputLiquido = document.getElementById('caixaLiquido');
 
       function calcularCaixa() {
-        const valorAtual = Number(inputValor.value || 0);
+        const valorAtual = Number(inputValor.value);
         const forma = selectForma.value;
         const taxaPercentual = (forma === 'Pix' || forma === 'Dinheiro') ? 0 : 4;
         const valorTaxa = valorAtual * (taxaPercentual / 100);
@@ -428,12 +428,23 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
       inputValor.addEventListener('input', calcularCaixa);
       selectForma.addEventListener('change', calcularCaixa);
       calcularCaixa();
+      let finalizandoCaixa = false;
 
       // Submissão do form, envio do WhatsApp e atualização da fila
       document.getElementById('formCaixa').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const botaoConfirmar = e.target.querySelector("button[type='submit']");
+        if (finalizandoCaixa) return;
 
+        const botaoConfirmar = e.target.querySelector("button[type='submit']");
+        const valorInformado = Number(inputValor.value);
+
+        if (inputValor.value === "" || Number.isNaN(valorInformado) || valorInformado <= 0) {
+          alert("Informe um valor maior que zero para finalizar o atendimento.");
+          inputValor.focus();
+          return;
+        }
+
+        finalizandoCaixa = true;
         await executarBotao(botaoConfirmar, async () => {
           try {
             const dadosCaixa = calcularCaixa();
@@ -450,6 +461,7 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
 
             if (!resposta.success) {
               alert(resposta.message || "Não foi possível finalizar o atendimento. Confira os dados e tente novamente.");
+              finalizandoCaixa = false;
               return;
             }
 
@@ -458,6 +470,7 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
           } catch (erro) {
             console.error("Erro ao finalizar atendimento:", erro);
             alert("Não foi possível finalizar o atendimento agora. Tente novamente.");
+            finalizandoCaixa = false;
           }
         });
       });
