@@ -7,14 +7,32 @@ const atendimentoId = params.get("id");
 
 let atendimentoAtual = null;
 
+function mostrarErroAtendimento(mensagem) {
+  document.getElementById("statusTitulo").textContent = mensagem;
+  document.querySelector(".cliente-info").style.display = "none";
+  document.querySelector(".cliente-actions").innerHTML = "";
+  document.querySelector(".contador-box").innerHTML = `<strong style="font-size: 36px;">--</strong>`;
+}
+
 async function carregarAtendimento() {
-  if (!atendimentoId) return;
+  if (!atendimentoId) {
+    mostrarErroAtendimento("Link de atendimento invalido. Solicite um novo link na recepcao.");
+    return;
+  }
 
   try {
     const resposta = await fetch(`${API_URL}?action=buscarAtendimento&id=${atendimentoId}`);
+    if (!resposta.ok) {
+      mostrarErroAtendimento("Nao foi possivel carregar seu atendimento agora. Tente novamente em alguns instantes.");
+      return;
+    }
+
     const dados = await resposta.json();
 
-    if (!dados.success) return;
+    if (!dados.success || !dados.atendimento) {
+      mostrarErroAtendimento(dados.message || "Atendimento nao encontrado. Solicite um novo link na recepcao.");
+      return;
+    }
 
     atendimentoAtual = dados.atendimento;
 
@@ -22,6 +40,7 @@ async function carregarAtendimento() {
 
   } catch (erro) {
     console.error(erro);
+    mostrarErroAtendimento("Nao foi possivel carregar seu atendimento agora. Verifique sua conexao e tente novamente.");
   }
 }
 
@@ -34,6 +53,7 @@ function renderizarTela(item) {
   const clienteActions = document.querySelector(".cliente-actions");
   const statusTitulo = document.getElementById("statusTitulo");
   const horarioBox = horarioEl.closest("div");
+  document.querySelector(".cliente-info").style.display = "";
 
   // Preencher dados básicos
   clienteEl.textContent = item.cliente || "--";
@@ -161,7 +181,9 @@ async function solicitarReagendamento(horario) {
 
 // ------------------------
 // Atualiza tela a cada 15s
-setInterval(carregarAtendimento, 15000);
+if (atendimentoId) {
+  setInterval(carregarAtendimento, 15000);
+}
 
 // Inicializa ao carregar a página
 carregarAtendimento();

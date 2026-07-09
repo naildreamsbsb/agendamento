@@ -133,20 +133,25 @@ function fecharModalEditar(){document.getElementById("modalEditar").classList.re
 // ------------------------------
 // Carregar Fila
 async function carregarFila(){
-  const dados = await api("listarFila");
   const container = document.getElementById("filas");
-  container.innerHTML="";
-  if(!dados.success||Object.keys(dados.filas).length===0){
-    container.innerHTML=`<p class="empty">Nenhuma cliente na fila no momento.</p>`;
-    return;
+  try {
+    const dados = await api("listarFila");
+    container.innerHTML="";
+    if(!dados.success||!dados.filas||Object.keys(dados.filas).length===0){
+      container.innerHTML=`<p class="empty">Nenhuma cliente na fila no momento.</p>`;
+      return;
+    }
+    Object.keys(dados.filas).forEach(manicure=>{
+      const lista = dados.filas[manicure];
+      const bloco = document.createElement("div");
+      bloco.className="fila-bloco";
+      bloco.innerHTML=`<h3>${manicure}</h3>${lista.map(criarCardAtendimento).join("")}`;
+      container.appendChild(bloco);
+    });
+  } catch (erro) {
+    console.error("Erro ao carregar fila:", erro);
+    container.innerHTML=`<p class="empty">Nao foi possivel carregar a fila. Tente atualizar novamente.</p>`;
   }
-  Object.keys(dados.filas).forEach(manicure=>{
-    const lista = dados.filas[manicure];
-    const bloco = document.createElement("div");
-    bloco.className="fila-bloco";
-    bloco.innerHTML=`<h3>${manicure}</h3>${lista.map(criarCardAtendimento).join("")}`;
-    container.appendChild(bloco);
-  });
 }
 
 // ------------------------------
@@ -154,6 +159,10 @@ async function carregarFila(){
 async function mudarStatus(id,status){
   await api("atualizarStatus",{id,status});
   await carregarFila();
+}
+
+async function iniciarAtendimento(id){
+  await mudarStatus(id,"Em atendimento");
 }
 
 // ------------------------------
@@ -445,6 +454,10 @@ async function marcarAusente(id, whatsapp, cliente, servico, botao) {
 
 // ------------------------------
 // Inicialização
+document.getElementById("btnAtualizar").addEventListener("click", async (e) => {
+  await executarBotao(e.currentTarget, carregarFila);
+});
+
 carregarServicos();
 carregarManicures();
 carregarFila();
