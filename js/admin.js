@@ -400,19 +400,66 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
       `;
       document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-      // Atualiza valor líquido quando a forma de pagamento mudar
+      // Atualiza valor líquido quando o valor ou a forma de pagamento mudar
+      const inputValor = document.getElementById('caixaValor');
       const selectForma = document.getElementById('caixaForma');
       const inputLiquido = document.getElementById('caixaLiquido');
-      selectForma.addEventListener('change', () => {
+
+      function calcularCaixa() {
+        const valorAtual = Number(inputValor.value || 0);
         const forma = selectForma.value;
-        if (forma === 'Pix' || forma === 'Dinheiro') inputLiquido.value = valorBruto;
-        else inputLiquido.value = valorBruto - valorBruto * 0.04; // exemplo taxa 4%
-      });
+        const taxaPercentual = (forma === 'Pix' || forma === 'Dinheiro') ? 0 : 4;
+        const valorTaxa = valorAtual * (taxaPercentual / 100);
+        const valorLiquido = valorAtual - valorTaxa;
+
+        inputLiquido.value = valorLiquido.toFixed(2);
+
+        return {
+          valorBruto: valorAtual.toFixed(2),
+          formaPagamento: forma,
+          bandeiraTipo: taxaPercentual === 0 ? "" : forma,
+          parcelas: 1,
+          taxaPercentual: taxaPercentual.toFixed(2),
+          valorTaxa: valorTaxa.toFixed(2),
+          valorLiquido: valorLiquido.toFixed(2)
+        };
+      }
+
+      inputValor.addEventListener('input', calcularCaixa);
+      selectForma.addEventListener('change', calcularCaixa);
+      calcularCaixa();
 
       // Submissão do form, envio do WhatsApp e atualização da fila
       document.getElementById('formCaixa').addEventListener('submit', async (e) => {
         e.preventDefault();
-        // restante da lógica de finalização...
+        const botaoConfirmar = e.target.querySelector("button[type='submit']");
+
+        await executarBotao(botaoConfirmar, async () => {
+          try {
+            const dadosCaixa = calcularCaixa();
+            const resposta = await api("finalizarAtendimento", {
+              id,
+              valorBruto: dadosCaixa.valorBruto,
+              formaPagamento: dadosCaixa.formaPagamento,
+              bandeiraTipo: dadosCaixa.bandeiraTipo,
+              parcelas: dadosCaixa.parcelas,
+              taxaPercentual: dadosCaixa.taxaPercentual,
+              valorTaxa: dadosCaixa.valorTaxa,
+              valorLiquido: dadosCaixa.valorLiquido
+            });
+
+            if (!resposta.success) {
+              alert(resposta.message || "Não foi possível finalizar o atendimento. Confira os dados e tente novamente.");
+              return;
+            }
+
+            document.getElementById('modalCaixa').remove();
+            await carregarFila();
+          } catch (erro) {
+            console.error("Erro ao finalizar atendimento:", erro);
+            alert("Não foi possível finalizar o atendimento agora. Tente novamente.");
+          }
+        });
       });
 
       // Mostra o modal
