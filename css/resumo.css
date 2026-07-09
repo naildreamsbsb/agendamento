@@ -1,0 +1,203 @@
+.resumo-container {
+  max-width: 1240px;
+}
+
+.resumo-toolbar {
+  display: flex;
+  align-items: end;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.resumo-campo {
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.resumo-campo span,
+.resumo-card span,
+.resumo-item span,
+.resumo-data-label {
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #9b735e;
+}
+
+.resumo-campo input {
+  width: 100%;
+  border: 1px solid rgba(115, 85, 65, 0.18);
+  background: #fbf8f5;
+  color: #2b211c;
+  border-radius: 18px;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+  outline: none;
+}
+
+.resumo-campo input:focus {
+  border-color: #9b735e;
+  box-shadow: 0 0 0 4px rgba(155, 115, 94, 0.12);
+  background: #fff;
+}
+
+.resumo-toolbar button {
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #2b211c, #6f4e3f);
+  color: #fff;
+  padding: 15px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resumo-toolbar button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(65, 43, 31, 0.18);
+}
+
+.resumo-toolbar button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.resumo-feedback {
+  min-height: 20px;
+  margin-top: 14px;
+  color: #6f4e3f;
+  font-size: 14px;
+}
+
+.resumo-feedback.erro {
+  color: #9b2f2f;
+}
+
+.resumo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.resumo-card {
+  min-height: 112px;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(115, 85, 65, 0.16);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 16px 36px rgba(65, 43, 31, 0.09);
+}
+
+.resumo-card strong {
+  font-size: 28px;
+  line-height: 1;
+  color: #2b211c;
+}
+
+.resumo-card.destaque {
+  background: #2b211c;
+}
+
+.resumo-card.destaque span,
+.resumo-card.destaque strong {
+  color: #fff;
+}
+
+.resumo-duas-colunas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.resumo-lista {
+  display: grid;
+  gap: 10px;
+}
+
+.resumo-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 14px;
+  align-items: center;
+  background: #fbf8f5;
+  border: 1px solid rgba(115, 85, 65, 0.12);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.resumo-item strong {
+  font-size: 18px;
+  color: #2b211c;
+}
+
+.resumo-item small {
+  grid-column: 1 / -1;
+  color: #6f4e3f;
+  font-size: 13px;
+}
+
+.resumo-tabela-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.resumo-tabela {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: collapse;
+}
+
+.resumo-tabela th,
+.resumo-tabela td {
+  padding: 13px 12px;
+  border-bottom: 1px solid rgba(115, 85, 65, 0.12);
+  text-align: left;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+.resumo-tabela th {
+  color: #6f4e3f;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: #fbf8f5;
+}
+
+.resumo-tabela td.valor {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.resumo-vazio {
+  display: none;
+}
+
+.resumo-vazio.ativo {
+  display: block;
+}
+
+@media (max-width: 780px) {
+  .resumo-grid,
+  .resumo-duas-colunas {
+    grid-template-columns: 1fr;
+  }
+
+  .resumo-toolbar {
+    align-items: stretch;
+  }
+
+  .resumo-campo,
+  .resumo-toolbar button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resumo do Caixa | Nail Dreams</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/resumo.css">
+</head>
+<body>
+  <main class="admin-container resumo-container">
+    <header class="admin-header">
+      <img src="assets/logo.png" alt="Nail Dreams" class="admin-logo">
+      <div>
+        <p class="eyebrow">Painel financeiro</p>
+        <h1>Resumo do Caixa</h1>
+      </div>
+    </header>
+
+    <section class="card admin-card">
+      <div class="resumo-toolbar">
+        <label class="resumo-campo">
+          <span>Data início</span>
+          <input type="date" id="dataInicio">
+        </label>
+
+        <label class="resumo-campo">
+          <span>Data fim</span>
+          <input type="date" id="dataFim">
+        </label>
+
+        <button type="button" id="btnBuscarResumo">Buscar resumo</button>
+      </div>
+
+      <p id="resumoFeedback" class="resumo-feedback" aria-live="polite"></p>
+    </section>
+
+    <section class="resumo-grid" aria-label="Totais do caixa">
+      <article class="resumo-card">
+        <span>Atendidas</span>
+        <strong id="totalAtendidas">0</strong>
+      </article>
+
+      <article class="resumo-card">
+        <span>Não atendidas</span>
+        <strong id="totalNaoAtendidas">0</strong>
+      </article>
+
+      <article class="resumo-card">
+        <span>Total geral</span>
+        <strong id="totalRegistros">0</strong>
+      </article>
+
+      <article class="resumo-card">
+        <span>Total bruto</span>
+        <strong id="totalBruto">R$ 0,00</strong>
+      </article>
+
+      <article class="resumo-card">
+        <span>Total de taxas</span>
+        <strong id="totalTaxas">R$ 0,00</strong>
+      </article>
+
+      <article class="resumo-card destaque">
+        <span>Total líquido</span>
+        <strong id="totalLiquido">R$ 0,00</strong>
+      </article>
+    </section>
+
+    <section class="resumo-duas-colunas">
+      <article class="card admin-card">
+        <div class="section-title">
+          <h2>Formas de pagamento</h2>
+        </div>
+        <div id="resumoPagamentos" class="resumo-lista"></div>
+      </article>
+
+      <article class="card admin-card">
+        <div class="section-title">
+          <h2>Status</h2>
+        </div>
+        <div id="resumoStatus" class="resumo-lista"></div>
+      </article>
+    </section>
+
+    <section class="card admin-card">
+      <div class="section-title">
+        <h2>Atendimentos do período</h2>
+        <span id="dataResumoLabel" class="resumo-data-label"></span>
+      </div>
+
+      <div id="resumoVazio" class="empty resumo-vazio">Nenhum registro encontrado para este período.</div>
+
+      <div class="resumo-tabela-wrap">
+        <table class="resumo-tabela">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Cliente</th>
+              <th>Serviço</th>
+              <th>Manicure</th>
+              <th>Status</th>
+              <th>Valor bruto</th>
+              <th>Forma pagamento</th>
+              <th>Valor taxa</th>
+              <th>Valor líquido</th>
+            </tr>
+          </thead>
+          <tbody id="resumoTabela"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="config/config.js?v=20260708-2"></script>
+  <script src="js/resumo.js?v=20260709-2"></script>
+</body>
+</html>
