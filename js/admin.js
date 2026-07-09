@@ -49,6 +49,14 @@ async function executarBotao(botao, callback) {
   }
 }
 
+function montarLinkWhatsApp(telefone, mensagem) {
+  const numero = String(telefone || "").replace(/\D/g, "");
+  if (!numero) return "";
+
+  const numeroComPais = numero.startsWith("55") ? numero : `55${numero}`;
+  return `https://wa.me/${numeroComPais}?text=${encodeURIComponent(mensagem)}`;
+}
+
 // ------------------------------
 // Carregar serviços e manicures
 async function carregarServicos() {
@@ -116,9 +124,9 @@ function criarCardAtendimento(item) {
         <button onclick="chamarCliente('${item.id}', '${item.whatsapp}', '${item.cliente}', '${item.servico}')">Chamar</button>
         <button onclick="iniciarAtendimento('${item.id}', this)">Atender</button>
         <button onclick="finalizarAtendimento('${item.id}','${item.whatsapp}','${item.cliente}','${item.servico}', this)">Finalizar</button>
-        <button onclick="marcarAusente('${item.id}','${item.whatsapp}','${item.cliente}','${item.servico}', this)">Ausente</button>
-        <button onclick="mudarStatus('${item.id}','Desistiu')">Desistiu</button>
-        <button onclick="mudarStatus('${item.id}','Cancelada')">Cancelar</button>
+        <button onclick="marcarAusente('${item.id}','${item.whatsapp}','${item.cliente}', this)">Ausente</button>
+        <button onclick="mudarStatus('${item.id}','Desistiu','${item.whatsapp}','${item.cliente}', this)">Desistiu</button>
+        <button onclick="mudarStatus('${item.id}','Cancelada','${item.whatsapp}','${item.cliente}', this)">Cancelar</button>
       </div>
     </div>
   </article>`;
@@ -180,9 +188,30 @@ async function carregarFila(){
 
 // ------------------------------
 // Mudar status
-async function mudarStatus(id,status){
-  await api("atualizarStatus",{id,status});
-  await carregarFila();
+async function mudarStatus(id, status, whatsapp, cliente, botao) {
+  const mensagens = {
+    Ausente: `Oi, ${cliente}! Sentimos sua falta no seu atendimento na Nail Dreams. Entendemos que imprevistos acontecem e ficaremos felizes em te atender em outro momento. Quando quiser, é só chamar a gente. \u{1F485}\u2728`,
+    Desistiu: `Oi, ${cliente}! Tudo bem, entendemos sua desistência. Agradecemos por avisar e ficaremos felizes em te atender em uma próxima oportunidade. \u{1F485}\u2728`,
+    Cancelada: `Oi, ${cliente}! Seu atendimento foi cancelado por agora. Esperamos te receber em outro momento. Quando quiser remarcar, é só chamar a gente. \u{1F485}\u2728`
+  };
+
+  await executarBotao(botao, async () => {
+    const resultado = await api("atualizarStatus", { id, status });
+
+    if (resultado && resultado.success === false) {
+      throw new Error(resultado.message || "Nao foi possivel atualizar o status. Tente novamente.");
+    }
+
+    await carregarFila();
+
+    const link = montarLinkWhatsApp(whatsapp, mensagens[status] || "");
+    if (!link) {
+      alert("Status atualizado, mas o WhatsApp da cliente nao foi informado.");
+      return;
+    }
+
+    window.open(link, "_blank");
+  });
 }
 
 async function iniciarAtendimento(id, botao){
@@ -543,28 +572,8 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
 // ------------------------------
 //Botão ausente
 
-async function marcarAusente(id, whatsapp, cliente, servico, botao) {
-  await executarBotao(botao, async () => {
-    try {
-      // Atualiza status para Ausente na API
-      await api("atualizarStatus", { id, status: "Ausente" });
-
-      // Atualiza a fila do painel
-      await carregarFila();
-
-      // Monta a mensagem para cliente
-      const numero = String(whatsapp || "").replace(/\D/g, "");
-      const emojiTriste = "\u{1F622}"; // 😢
-      const mensagem = `Olá, ${cliente}! ${emojiTriste}\nPercebemos que você não compareceu ao seu atendimento Nail Dreams de ${servico}. Temos outras clientes na fila, mas ficaríamos felizes em atendê-la em outro momento!\nPara reagendar, envie uma mensagem para nossa loja: https://wa.me/55${numero}?text=Gostaria%20de%20reagendar%20meu%20atendimento.\nSiga-nos no Instagram: https://www.instagram.com/naildreams.bsb/`;
-
-      // Abre WhatsApp
-      window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`, "_blank");
-
-    } catch (erro) {
-      console.error("Erro ao marcar cliente como ausente:", erro);
-      alert("Não foi possível processar o status Ausente.");
-    }
-  });
+async function marcarAusente(id, whatsapp, cliente, botao) {
+  await mudarStatus(id, "Ausente", whatsapp, cliente, botao);
 }
 
 // ------------------------------
