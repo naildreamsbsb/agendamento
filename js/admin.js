@@ -7,8 +7,29 @@ async function api(action, params = {}) {
   const url = new URL(API_URL);
   url.searchParams.set("action", action);
   Object.keys(params).forEach(key => url.searchParams.set(key, params[key]));
-  const resposta = await fetch(url);
-  return resposta.json();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+  try {
+    const resposta = await fetch(url, { signal: controller.signal });
+
+    if (!resposta.ok) {
+      throw new Error("Nao foi possivel conectar com a API. Tente novamente.");
+    }
+
+    try {
+      return await resposta.json();
+    } catch (erro) {
+      throw new Error("A API retornou uma resposta invalida. Tente novamente.");
+    }
+  } catch (erro) {
+    if (erro.name === "AbortError") {
+      throw new Error("A conexao demorou demais. Verifique a internet e tente novamente.");
+    }
+    throw erro;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 // ------------------------------
@@ -18,7 +39,10 @@ async function executarBotao(botao, callback) {
   const textoOriginal = botao.textContent;
   botao.textContent = "Carregando...";
   try { await callback(); } 
-  catch(e) { console.error(e); } 
+  catch(e) {
+    console.error(e);
+    alert(e.message || "Nao foi possivel concluir a acao. Tente novamente.");
+  }
   finally { 
     botao.disabled = false;
     botao.textContent = textoOriginal;
@@ -90,7 +114,7 @@ function criarCardAtendimento(item) {
         <button onclick="copiarLink('${item.id}')">Copiar link</button>
         <button onclick="anteciparCliente('${item.id}', '${item.whatsapp}', '${item.cliente}', '${item.servico}')">Antecipar</button>
         <button onclick="chamarCliente('${item.id}', '${item.whatsapp}', '${item.cliente}', '${item.servico}')">Chamar</button>
-        <button onclick="iniciarAtendimento('${item.id}')">Atender</button>
+        <button onclick="iniciarAtendimento('${item.id}', this)">Atender</button>
         <button onclick="finalizarAtendimento('${item.id}','${item.whatsapp}','${item.cliente}','${item.servico}', this)">Finalizar</button>
         <button onclick="marcarAusente('${item.id}','${item.whatsapp}','${item.cliente}','${item.servico}', this)">Ausente</button>
         <button onclick="mudarStatus('${item.id}','Desistiu')">Desistiu</button>
@@ -161,8 +185,17 @@ async function mudarStatus(id,status){
   await carregarFila();
 }
 
-async function iniciarAtendimento(id){
-  await mudarStatus(id,"Em atendimento");
+async function iniciarAtendimento(id, botao){
+  await executarBotao(botao, async () => {
+    const resultado = await api("iniciarAtendimento", { id });
+
+    if (!resultado.success) {
+      alert(resultado.message || "Nao foi possivel iniciar o atendimento. Tente novamente.");
+      return;
+    }
+
+    await carregarFila();
+  });
 }
 
 // ------------------------------
@@ -377,7 +410,7 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
             <h2>Finalizar Atendimento - Caixa</h2>
             <form id="formCaixa" class="admin-form">
               <label>Valor</label>
-              <input type="number" id="caixaValor" value="${valorBruto}" inputmode="decimal" pattern="[0-9]*" min="0.01" step="0.01" required> <!-- valor pré-preenchido -->
+              <input type="text" id="caixaValor" value="${valorBruto}" inputmode="decimal" pattern="[0-9,.]*" required> <!-- valor pré-preenchido -->
               
               <label>Forma de pagamento</label>
               <select id="caixaForma" required>
@@ -405,10 +438,25 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
       const selectForma = document.getElementById('caixaForma');
       const inputLiquido = document.getElementById('caixaLiquido');
 
+      function normalizarValorCaixa(valor) {
+        const texto = String(valor || "").trim();
+        if (!texto) return NaN;
+        const normalizado = texto.includes(",")
+          ? texto.replace(/\./g, "").replace(",", ".")
+          : texto;
+        return Number(normalizado);
+      }
+
       function calcularCaixa() {
-        const valorAtual = Number(inputValor.value);
+        const valorAtual = normalizarValorCaixa(inputValor.value);
         const forma = selectForma.value;
         const taxaPercentual = (forma === 'Pix' || forma === 'Dinheiro') ? 0 : 4;
+
+        if (!Number.isFinite(valorAtual)) {
+          inputLiquido.value = "";
+          return null;
+        }
+
         const valorTaxa = valorAtual * (taxaPercentual / 100);
         const valorLiquido = valorAtual - valorTaxa;
 
@@ -436,9 +484,9 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
         if (finalizandoCaixa) return;
 
         const botaoConfirmar = e.target.querySelector("button[type='submit']");
-        const valorInformado = Number(inputValor.value);
+        const valorInformado = normalizarValorCaixa(inputValor.value);
 
-        if (inputValor.value === "" || Number.isNaN(valorInformado) || valorInformado <= 0) {
+        if (inputValor.value.trim() === "" || !Number.isFinite(valorInformado) || valorInformado <= 0) {
           alert("Informe um valor maior que zero para finalizar o atendimento.");
           inputValor.focus();
           return;
@@ -448,6 +496,13 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
         await executarBotao(botaoConfirmar, async () => {
           try {
             const dadosCaixa = calcularCaixa();
+            if (!dadosCaixa) {
+              alert("Informe um valor valido para finalizar o atendimento.");
+              finalizandoCaixa = false;
+              inputValor.focus();
+              return;
+            }
+
             const resposta = await api("finalizarAtendimento", {
               id,
               valorBruto: dadosCaixa.valorBruto,
