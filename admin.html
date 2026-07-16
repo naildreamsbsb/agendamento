@@ -32,12 +32,20 @@
         </select>
 
         <input type="number" id="tempoUsado" placeholder="Tempo em minutos">
-        <input type="time" id="horarioManual" placeholder="Horário manual">
 
         <select id="tipoAtendimento" required>
           <option value="Fila de espera">Fila de espera</option>
           <option value="Agendado">Agendado</option>
         </select>
+
+        <div id="camposAgendamento" class="campos-agendamento" hidden>
+          <label for="dataAtendimento">Data do atendimento</label>
+          <input type="date" id="dataAtendimento">
+          <label for="horaAtendimento">Horário do atendimento</label>
+          <input type="time" id="horaAtendimento">
+        </div>
+
+        <p id="mensagemCadastro" class="form-message" role="alert" aria-live="polite" hidden></p>
 
         <select id="aceitaAntecipacao">
           <option value="Sim">Aceita antecipação</option>
@@ -72,13 +80,21 @@
       <select id="editServico" required></select>
       <select id="editManicure" required></select>
 
-      <input type="time" id="editHorario">
       <input type="number" id="editTempoUsado" placeholder="Tempo em minutos">
 
       <select id="editTipoAtendimento">
         <option value="Fila de espera">Fila de espera</option>
         <option value="Agendado">Agendado</option>
       </select>
+
+      <div id="editCamposAgendamento" class="campos-agendamento" hidden>
+        <label for="editDataAtendimento">Data do atendimento</label>
+        <input type="date" id="editDataAtendimento">
+        <label for="editHoraAtendimento">Horário do atendimento</label>
+        <input type="time" id="editHoraAtendimento">
+      </div>
+
+      <p id="mensagemEdicao" class="form-message" role="alert" aria-live="polite" hidden></p>
 
       <select id="editAceitaAntecipacao">
         <option value="Sim">Aceita antecipação</option>
@@ -97,6 +113,6 @@
   </main>
 
   <script src="config/config.js?v=20260708-2"></script>
-  <script src="js/admin.js?v=20260709-3"></script>
+  <script src="js/admin.js?v=20260716-1"></script>
 </body>
 </html>

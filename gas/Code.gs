@@ -38,6 +38,8 @@ function doGet(e) {
       manicure: e.parameter.manicure,
       tempoUsado: e.parameter.tempoUsado,
       horarioManual: e.parameter.horarioManual,
+      dataAtendimento: e.parameter.dataAtendimento,
+      horaAtendimento: e.parameter.horaAtendimento,
       aceitaAntecipacao: e.parameter.aceitaAntecipacao,
       observacoes: e.parameter.observacoes,
       tipoAtendimento: e.parameter.tipoAtendimento
@@ -64,6 +66,8 @@ function doGet(e) {
     servico: e.parameter.servico,
     manicure: e.parameter.manicure,
     horario: e.parameter.horario,
+    dataAtendimento: e.parameter.dataAtendimento,
+    horaAtendimento: e.parameter.horaAtendimento,
     tempoUsado: e.parameter.tempoUsado,
     aceitaAntecipacao: e.parameter.aceitaAntecipacao,
     observacoes: e.parameter.observacoes,
@@ -210,6 +214,30 @@ function cadastrarAtendimento(dadosCliente) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheetByName("Atendimentos");
 
+  const cabecalhos = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const idxDataAtendimento = cabecalhos.indexOf("data_atendimento");
+  const idxHoraAtendimento = cabecalhos.indexOf("hora_atendimento");
+
+  if (idxDataAtendimento === -1 || idxHoraAtendimento === -1) {
+    return {
+      success: false,
+      message: "Adicione ao final da aba Atendimentos as colunas data_atendimento e hora_atendimento."
+    };
+  }
+
+  const tipoAtendimento = dadosCliente.tipoAtendimento || "Fila de espera";
+  const dataAtendimento = tipoAtendimento === "Agendado" ? (dadosCliente.dataAtendimento || "") : "";
+  const horaAtendimento = tipoAtendimento === "Agendado"
+    ? (dadosCliente.horaAtendimento || dadosCliente.horarioManual || "")
+    : "";
+
+  if (tipoAtendimento === "Agendado" && (!dataAtendimento || !horaAtendimento)) {
+    return {
+      success: false,
+      message: "Informe a data e o horário do atendimento agendado."
+    };
+  }
+
   const servico = buscarServicoPorNome(dadosCliente.servico);
 
   if (!servico) {
@@ -267,8 +295,15 @@ if (dadosCliente.horarioManual) {
     "",                             // WhatsApp próximo
     "",                             // WhatsApp antecipação
     dadosCliente.observacoes || "" ,  // Observações
-    dadosCliente.tipoAtendimento || "Fila de espera"
+    tipoAtendimento
   ];
+
+  while (novaLinha.length < cabecalhos.length) {
+    novaLinha.push("");
+  }
+
+  novaLinha[idxDataAtendimento] = dataAtendimento;
+  novaLinha[idxHoraAtendimento] = horaAtendimento;
 
   sheet.appendRow(novaLinha);
 
@@ -287,7 +322,9 @@ if (dadosCliente.horarioManual) {
       tempoUsado,
       valorBruto,
       status: "Aguardando",
-      horarioEstimado
+      horarioEstimado,
+      dataAtendimento,
+      horaAtendimento
     }
   };
 }
@@ -332,6 +369,8 @@ function listarFila() {
   const idxTempo = cabecalhos.indexOf("Tempo usado (min)");
   const idxTempoRestante = cabecalhos.indexOf("Tempo restante");
   const idxTipoAtendimento = cabecalhos.indexOf("Tipo atendimento");
+  const idxDataAtendimento = cabecalhos.indexOf("data_atendimento");
+  const idxHoraAtendimento = cabecalhos.indexOf("hora_atendimento");
   const idxId = cabecalhos.indexOf("ID");
 
   const filas = {};
@@ -370,6 +409,8 @@ function listarFila() {
       horarioEstimado: linhaExibida[idxHorario],
       tempoRestante: linhaExibida[idxTempoRestante],
       tipoAtendimento: linhaExibida[idxTipoAtendimento],
+      dataAtendimento: idxDataAtendimento === -1 ? "" : linhaExibida[idxDataAtendimento],
+      horaAtendimento: idxHoraAtendimento === -1 ? "" : linhaExibida[idxHoraAtendimento],
       tempoUsado: linha[idxTempo]
     });
   }
@@ -420,6 +461,8 @@ function buscarAtendimentoPorId(idBuscado) {
   const idxTempoRestante = cabecalhos.indexOf("Tempo restante");
   const idxTipoAtendimento = cabecalhos.indexOf("Tipo atendimento");
   const idxAceita = cabecalhos.indexOf("Aceita antecipação?");
+  const idxDataAtendimento = cabecalhos.indexOf("data_atendimento");
+  const idxHoraAtendimento = cabecalhos.indexOf("hora_atendimento");
 
   for (let i = 1; i < dados.length; i++) {
     const linha = dados[i];
@@ -451,6 +494,8 @@ function buscarAtendimentoPorId(idBuscado) {
           tempoRestante: linhaExibida[idxTempoRestante],
           tipoAtendimento: linhaExibida[idxTipoAtendimento],
           aceitaAntecipacao: linha[idxAceita],
+          dataAtendimento: idxDataAtendimento === -1 ? "" : linhaExibida[idxDataAtendimento],
+          horaAtendimento: idxHoraAtendimento === -1 ? "" : linhaExibida[idxHoraAtendimento],
           posicao,
           pessoasNaFrente
         }
@@ -550,16 +595,31 @@ function editarAtendimento(dadosEdicao) {
 
   const idxId = cabecalhos.indexOf("ID");
 
+  const tipoAtendimento = dadosEdicao.tipoAtendimento || "Fila de espera";
+  const dataAtendimento = tipoAtendimento === "Agendado" ? (dadosEdicao.dataAtendimento || "") : "";
+  const horaAtendimento = tipoAtendimento === "Agendado"
+    ? (dadosEdicao.horaAtendimento || dadosEdicao.horario || "")
+    : "";
+
+  if (tipoAtendimento === "Agendado" && (!dataAtendimento || !horaAtendimento)) {
+    return {
+      success: false,
+      message: "Informe a data e o horário do atendimento agendado."
+    };
+  }
+
   const campos = {
     "Cliente": dadosEdicao.cliente,
     "WhatsApp": dadosEdicao.telefone,
     "Serviço": dadosEdicao.servico,
     "Manicure": dadosEdicao.manicure,
-    "Horário estimado": dadosEdicao.horario,
+    "Horário estimado": horaAtendimento,
     "Tempo usado (min)": dadosEdicao.tempoUsado,
     "Aceita antecipação?": dadosEdicao.aceitaAntecipacao,
     "Observações": dadosEdicao.observacoes,
-    "Tipo atendimento": dadosEdicao.tipoAtendimento
+    "Tipo atendimento": tipoAtendimento,
+    "data_atendimento": dataAtendimento,
+    "hora_atendimento": horaAtendimento
   };
 
   for (let i = 1; i < dados.length; i++) {

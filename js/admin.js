@@ -57,6 +57,47 @@ function montarLinkWhatsApp(telefone, mensagem) {
   return `https://wa.me/${numeroComPais}?text=${encodeURIComponent(mensagem)}`;
 }
 
+function normalizarDataInput(valor) {
+  if (!valor) return "";
+  const texto = String(valor).trim();
+  const iso = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  const br = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  return br ? `${br[3]}-${br[2]}-${br[1]}` : "";
+}
+
+function formatarDataAtendimento(valor) {
+  const data = normalizarDataInput(valor);
+  if (!data) return "";
+  const [ano, mes, dia] = data.split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
+function atualizarCamposAgendamento(prefixo = "") {
+  const editando = prefixo === "edit";
+  const tipo = document.getElementById(editando ? "editTipoAtendimento" : "tipoAtendimento").value;
+  const bloco = document.getElementById(editando ? "editCamposAgendamento" : "camposAgendamento");
+  const data = document.getElementById(editando ? "editDataAtendimento" : "dataAtendimento");
+  const hora = document.getElementById(editando ? "editHoraAtendimento" : "horaAtendimento");
+  const agendado = tipo === "Agendado";
+  bloco.hidden = !agendado;
+  data.required = agendado;
+  hora.required = agendado;
+  if (!agendado) { data.value = ""; hora.value = ""; }
+}
+
+function validarAgendamento(tipo, data, hora, mensagemId) {
+  const mensagem = document.getElementById(mensagemId);
+  mensagem.hidden = true;
+  mensagem.textContent = "";
+  if (tipo !== "Agendado") return true;
+  if (!data) mensagem.textContent = "Informe a data do atendimento agendado.";
+  else if (!hora) mensagem.textContent = "Informe o horário do atendimento agendado.";
+  else return true;
+  mensagem.hidden = false;
+  return false;
+}
+
 // ------------------------------
 // Carregar serviços e manicures
 async function carregarServicos() {
@@ -105,8 +146,14 @@ function alternarCard(botao) {
 // ------------------------------
 // Criar card de atendimento
 function criarCardAtendimento(item) {
-  const indicador = item.tipoAtendimento === "Agendado" ? item.horarioEstimado || "--:--" : item.tempoRestante || "--:--";
+  const dataAtendimento = item.dataAtendimento || item.data_atendimento || "";
+  const horaAtendimento = item.horaAtendimento || item.hora_atendimento || item.horarioEstimado || "";
+  const dataFormatada = formatarDataAtendimento(dataAtendimento);
+  const indicador = item.tipoAtendimento === "Agendado" ? horaAtendimento || "--:--" : item.tempoRestante || "--:--";
   const legenda = item.tipoAtendimento === "Agendado" ? "Agendado" : "Restante";
+  const detalheAgendamento = item.tipoAtendimento === "Agendado"
+    ? `<p class="fila-agendamento"><strong>Agendado para ${dataFormatada || "data não informada"} às ${horaAtendimento || "--:--"}</strong></p>`
+    : "";
 
   return `<article class="fila-card" data-id="${item.id}">
     <button class="fila-resumo" onclick="alternarCard(this)">
@@ -115,6 +162,7 @@ function criarCardAtendimento(item) {
     </button>
     <div class="fila-detalhes">
       <p class="fila-servico">${item.servico}</p>
+      ${detalheAgendamento}
       <div class="fila-status">${item.status}</div>
       <div class="fila-actions">
         <button onclick="editarAtendimento('${item.id}', this)">Editar</button>
@@ -148,9 +196,11 @@ async function editarAtendimento(id, botao) {
       document.getElementById("editTelefone").value = item.whatsapp || "";
       document.getElementById("editServico").value = item.servico || "";
       document.getElementById("editManicure").value = item.manicure || "";
-      document.getElementById("editHorario").value = item.horarioEstimado || "";
       document.getElementById("editTempoUsado").value = item.tempoUsado || "";
       document.getElementById("editTipoAtendimento").value = item.tipoAtendimento || "Fila de espera";
+      document.getElementById("editDataAtendimento").value = normalizarDataInput(item.dataAtendimento || item.data_atendimento || "");
+      document.getElementById("editHoraAtendimento").value = item.horaAtendimento || item.hora_atendimento || item.horarioEstimado || "";
+      atualizarCamposAgendamento("edit");
       document.getElementById("editAceitaAntecipacao").value = item.aceitaAntecipacao || "Sim";
       document.getElementById("editObservacoes").value = item.observacoes || "";
       document.getElementById("modalEditar").classList.add("ativo");
@@ -240,18 +290,22 @@ document.getElementById("formCadastro").addEventListener("submit", async (e) => 
     const telefone = document.getElementById("telefone").value;
     const servico = document.getElementById("servico").value;
     const manicure = document.getElementById("manicure").value;
-    const horario = document.getElementById("horarioManual").value;
     const tipoAtendimento = document.getElementById("tipoAtendimento").value;
+    const dataAtendimento = tipoAtendimento === "Agendado" ? document.getElementById("dataAtendimento").value : "";
+    const horaAtendimento = tipoAtendimento === "Agendado" ? document.getElementById("horaAtendimento").value : "";
     const aceitaAntecipacao = document.getElementById("aceitaAntecipacao").value;
     const tempoUsado = document.getElementById("tempoUsado").value;
     const observacoes = document.getElementById("observacoes").value;
 
+    if (!validarAgendamento(tipoAtendimento, dataAtendimento, horaAtendimento, "mensagemCadastro")) return;
     const dados = {
       cliente,
       telefone,
       servico,
       manicure,
-      horarioManual: horario,
+      dataAtendimento,
+      horaAtendimento,
+      horarioManual: horaAtendimento,
       tipoAtendimento,
       aceitaAntecipacao,
       tempoUsado,
@@ -265,8 +319,9 @@ document.getElementById("formCadastro").addEventListener("submit", async (e) => 
       // Monta a mensagem do WhatsApp
       const numero = String(telefone || "").replace(/\D/g,"");
       const emojiAviso = "\u2728"; // ✨
-      const horarioFormatado = horario || resultado.atendimento.horarioEstimado || "--:--";
-      const mensagem = `Olá, ${cliente}! ${emojiAviso}\nSeu atendimento Nail Dreams foi confirmado.\nServiço: ${servico}\nHorário: ${horarioFormatado}\nManicure: ${manicure}`;
+      const horarioFormatado = horaAtendimento || resultado.atendimento.horarioEstimado || "--:--";
+      const quando = tipoAtendimento === "Agendado" ? `\nAgendado para: ${formatarDataAtendimento(dataAtendimento)} às ${horarioFormatado}` : "";
+      const mensagem = `Olá, ${cliente}! ${emojiAviso}\nSeu atendimento Nail Dreams foi confirmado.\nServiço: ${servico}${quando}\nManicure: ${manicure}`;
 
       // Envia WhatsApp
       window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`, "_blank");
@@ -276,6 +331,7 @@ document.getElementById("formCadastro").addEventListener("submit", async (e) => 
 
       // Limpar formulário
       e.target.reset();
+      atualizarCamposAgendamento();
 
       // Atualizar fila
       await carregarFila();
@@ -291,15 +347,21 @@ document.getElementById("formEditar").addEventListener("submit",async(e)=>{
   e.preventDefault();
   const botao = document.querySelector("#formEditar button[type='submit']");
   await executarBotao(botao, async ()=>{
+    const tipoAtendimento = document.getElementById("editTipoAtendimento").value;
+    const dataAtendimento = tipoAtendimento === "Agendado" ? document.getElementById("editDataAtendimento").value : "";
+    const horaAtendimento = tipoAtendimento === "Agendado" ? document.getElementById("editHoraAtendimento").value : "";
+    if (!validarAgendamento(tipoAtendimento, dataAtendimento, horaAtendimento, "mensagemEdicao")) return;
     const dados={
       id: document.getElementById("editId").value,
       cliente: document.getElementById("editCliente").value,
       telefone: document.getElementById("editTelefone").value,
       servico: document.getElementById("editServico").value,
       manicure: document.getElementById("editManicure").value,
-      horario: document.getElementById("editHorario").value,
+      dataAtendimento,
+      horaAtendimento,
+      horario: horaAtendimento,
       tempoUsado: document.getElementById("editTempoUsado").value,
-      tipoAtendimento: document.getElementById("editTipoAtendimento").value,
+      tipoAtendimento,
       aceitaAntecipacao: document.getElementById("editAceitaAntecipacao").value,
       observacoes: document.getElementById("editObservacoes").value
     };
@@ -587,6 +649,30 @@ async function marcarAusente(id, whatsapp, cliente, botao) {
 document.getElementById("btnAtualizar").addEventListener("click", async (e) => {
   await executarBotao(e.currentTarget, carregarFila);
 });
+
+document.getElementById("tipoAtendimento").addEventListener("change", () => atualizarCamposAgendamento());
+document.getElementById("editTipoAtendimento").addEventListener("change", () => atualizarCamposAgendamento("edit"));
+
+[
+  ["dataAtendimento", "mensagemCadastro", "Informe a data do atendimento agendado."],
+  ["horaAtendimento", "mensagemCadastro", "Informe o horário do atendimento agendado."],
+  ["editDataAtendimento", "mensagemEdicao", "Informe a data do atendimento agendado."],
+  ["editHoraAtendimento", "mensagemEdicao", "Informe o horário do atendimento agendado."]
+].forEach(([campoId, mensagemId, texto]) => {
+  const campo = document.getElementById(campoId);
+  const mensagem = document.getElementById(mensagemId);
+  campo.addEventListener("invalid", () => {
+    mensagem.textContent = texto;
+    mensagem.hidden = false;
+  });
+  campo.addEventListener("input", () => {
+    mensagem.textContent = "";
+    mensagem.hidden = true;
+  });
+});
+
+atualizarCamposAgendamento();
+atualizarCamposAgendamento("edit");
 
 carregarServicos();
 carregarManicures();

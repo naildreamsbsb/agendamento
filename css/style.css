@@ -1445,3 +1445,7 @@ h1 {
 .cliente-card .acoes-agendamento .btn-reagendar:hover {
   background-color: #5a3f33;
 }
+.campos-agendamento { display: contents; }
+.campos-agendamento[hidden] { display: none; }
+.admin-form label { font-weight: 600; }
+.form-message { margin: 0; color: #9f2430; font-weight: 600; }
