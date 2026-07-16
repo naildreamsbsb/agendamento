@@ -1449,3 +1449,20 @@ h1 {
 .campos-agendamento[hidden] { display: none; }
 .admin-form label { font-weight: 600; }
 .form-message { margin: 0; color: #9f2430; font-weight: 600; }
+
+.contador-box.resumo-agendado {
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.contador-box.resumo-agendado strong {
+  font-size: clamp(24px, 8vw, 38px);
+  line-height: 1.15;
+}
+
+.contador-box.resumo-agendado span:last-child {
+  font-size: 18px;
+  text-transform: none;
+}

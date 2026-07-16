@@ -15,7 +15,7 @@
 
       <p class="eyebrow">Nail Dreams</p>
 
-      <div class="contador-box">
+      <div class="contador-box" id="resumoAtendimento">
         <strong id="contadorFila">--</strong>
         <span>pessoas à sua frente</span>
       </div>
@@ -38,7 +38,12 @@
           <strong id="manicure"></strong>
         </div>
 
-        <div>
+        <div id="dataAtendimentoBox" hidden>
+          <span>Data do atendimento</span>
+          <strong id="dataAtendimento"></strong>
+        </div>
+
+        <div id="horarioAtendimentoBox">
           <span>Tempo restante</span>
           <strong id="horario"></strong>
         </div>
@@ -60,7 +65,7 @@
   <div class="modal" id="modalCancelar">
     <div class="modal-card">
       <h2>Cancelar atendimento?</h2>
-      <p>Essa ação retirará seu nome da fila. Deseja continuar?</p>
+      <p id="textoCancelar">Essa ação cancelará seu atendimento. Deseja continuar?</p>
 
       <div class="modal-actions">
         <button onclick="fecharModais()">Voltar</button>
@@ -83,6 +88,6 @@
   </div>
 
   <script src="config/config.js?v=20260708-2"></script>
-  <script src="js/cliente.js?v=20260708-2"></script>
+  <script src="js/cliente.js?v=20260716-1"></script>
 </body>
 </html>

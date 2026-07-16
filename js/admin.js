@@ -57,6 +57,31 @@ function montarLinkWhatsApp(telefone, mensagem) {
   return `https://wa.me/${numeroComPais}?text=${encodeURIComponent(mensagem)}`;
 }
 
+function montarLinkCliente(id) {
+  return `${window.location.origin}${window.location.pathname.replace("admin.html", "cliente.html")}?id=${encodeURIComponent(id)}`;
+}
+
+function montarMensagemConfirmacao(atendimento, linkCliente) {
+  const agendado = atendimento.tipoAtendimento === "Agendado";
+  const linhas = [
+    `Olá, ${atendimento.cliente}!`,
+    agendado
+      ? "Seu atendimento Nail Dreams foi agendado com sucesso."
+      : "Seu atendimento Nail Dreams foi registrado na fila de espera.",
+    "",
+    `Serviço: ${atendimento.servico}`,
+    `Manicure: ${atendimento.manicure}`
+  ];
+
+  if (agendado) {
+    linhas.push(`Data: ${formatarDataAtendimento(atendimento.dataAtendimento) || "Não informada"}`);
+    linhas.push(`Horário: ${atendimento.horaAtendimento || atendimento.horarioEstimado || "Não informado"}`);
+  }
+
+  linhas.push("", "Acompanhe seu atendimento aqui:", linkCliente);
+  return linhas.join("\n");
+}
+
 function normalizarDataInput(valor) {
   if (!valor) return "";
   const texto = String(valor).trim();
@@ -240,9 +265,9 @@ async function carregarFila(){
 // Mudar status
 async function mudarStatus(id, status, whatsapp, cliente, botao) {
   const mensagens = {
-    Ausente: `Oi, ${cliente}! Sentimos sua falta no seu atendimento na Nail Dreams. Entendemos que imprevistos acontecem e ficaremos felizes em te atender em outro momento. Quando quiser, é só chamar a gente. \u{1F485}\u2728`,
-    Desistiu: `Oi, ${cliente}! Tudo bem, entendemos sua desistência. Agradecemos por avisar e ficaremos felizes em te atender em uma próxima oportunidade. \u{1F485}\u2728`,
-    Cancelada: `Oi, ${cliente}! Seu atendimento foi cancelado por agora. Esperamos te receber em outro momento. Quando quiser remarcar, é só chamar a gente. \u{1F485}\u2728`
+    Ausente: `Oi, ${cliente}! Sentimos sua falta no seu atendimento na Nail Dreams. Entendemos que imprevistos acontecem e ficaremos felizes em te atender em outro momento. Quando quiser, é só chamar a gente.`,
+    Desistiu: `Oi, ${cliente}! Tudo bem, entendemos sua desistência. Agradecemos por avisar e ficaremos felizes em te atender em uma próxima oportunidade.`,
+    Cancelada: `Oi, ${cliente}! Seu atendimento foi cancelado por agora. Esperamos te receber em outro momento. Quando quiser remarcar, é só chamar a gente.`
   };
 
   await executarBotao(botao, async () => {
@@ -317,14 +342,19 @@ document.getElementById("formCadastro").addEventListener("submit", async (e) => 
 
     if (resultado.success) {
       // Monta a mensagem do WhatsApp
-      const numero = String(telefone || "").replace(/\D/g,"");
-      const emojiAviso = "\u2728"; // ✨
-      const horarioFormatado = horaAtendimento || resultado.atendimento.horarioEstimado || "--:--";
-      const quando = tipoAtendimento === "Agendado" ? `\nAgendado para: ${formatarDataAtendimento(dataAtendimento)} às ${horarioFormatado}` : "";
-      const mensagem = `Olá, ${cliente}! ${emojiAviso}\nSeu atendimento Nail Dreams foi confirmado.\nServiço: ${servico}${quando}\nManicure: ${manicure}`;
+      const atendimentoCriado = {
+        ...resultado.atendimento,
+        cliente,
+        servico,
+        manicure,
+        tipoAtendimento,
+        dataAtendimento,
+        horaAtendimento
+      };
+      const mensagem = montarMensagemConfirmacao(atendimentoCriado, montarLinkCliente(resultado.atendimento.id));
 
       // Envia WhatsApp
-      window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`, "_blank");
+      window.open(montarLinkWhatsApp(telefone, mensagem), "_blank");
 
       // Mensagem de alerta
       alert("Atendimento cadastrado e mensagem enviada com sucesso!");
@@ -381,18 +411,18 @@ async function enviarWhatsApp(id, whatsapp, cliente, servico, status, horarioEst
   const botao = document.querySelector(`.fila-card[data-id='${id}'] button`);
   await executarBotao(botao, async () => {
     try {
-      const numero = String(whatsapp || "").replace(/\D/g,"");
-      if (!numero) {
+      if (!String(whatsapp || "").replace(/\D/g, "")) {
         alert("Número de WhatsApp inválido ou não informado.");
         return;
       }
-      
-      const emojiAviso = "\u2728"; // ✨
-      const horario = horarioEstimado || "--:--";
-      
-      const mensagem = `Olá, ${cliente}! ${emojiAviso}\nSeu atendimento Nail Dreams foi confirmado.\nServiço: ${servico}\nHorário: ${horario}`;
-      
-      window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`, "_blank");
+
+      const resultado = await api("buscarAtendimento", { id });
+      if (!resultado.success || !resultado.atendimento) {
+        throw new Error("Não foi possível carregar os dados do atendimento.");
+      }
+
+      const mensagem = montarMensagemConfirmacao(resultado.atendimento, montarLinkCliente(id));
+      window.open(montarLinkWhatsApp(whatsapp, mensagem), "_blank");
     } catch (erro) {
       console.error("Erro ao enviar WhatsApp:", erro);
       alert("Não foi possível abrir o WhatsApp.");
@@ -413,8 +443,7 @@ async function anteciparCliente(id, whatsapp, cliente, servico) {
         return;
       }
 
-      const emojiAviso = "\u2728"; // ✨
-      const mensagem = `Olá, ${cliente}! ${emojiAviso}\nSeu atendimento Nail Dreams está agendado para ${servico}. Você gostaria de antecipar seu atendimento se houver oportunidade?`;
+      const mensagem = `Olá, ${cliente}!\nSeu atendimento Nail Dreams está agendado para ${servico}. Você gostaria de antecipar seu atendimento se houver oportunidade?`;
 
       window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`, "_blank");
     } catch (erro) {
@@ -456,8 +485,7 @@ async function chamarCliente(id, whatsapp, cliente, servico) {
         return;
       }
 
-      const emojiAviso = "\u2728"; // ✨
-      const mensagem = `Olá, ${cliente}! ${emojiAviso}\nSeu atendimento Nail Dreams está chegando. Você está sendo chamada para ser atendida agora!`;
+      const mensagem = `Olá, ${cliente}!\nSeu atendimento Nail Dreams está chegando. Você está sendo chamada para ser atendida agora!`;
 
       // Abrir WhatsApp
       window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`, "_blank");

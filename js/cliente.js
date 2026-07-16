@@ -53,7 +53,11 @@ function renderizarTela(item) {
   const clienteActions = document.querySelector(".cliente-actions");
   const statusTitulo = document.getElementById("statusTitulo");
   const horarioBox = horarioEl.closest("div");
+  const dataBox = document.getElementById("dataAtendimentoBox");
+  const dataEl = document.getElementById("dataAtendimento");
   document.querySelector(".cliente-info").style.display = "";
+  contadorBox.classList.remove("resumo-agendado");
+  dataBox.hidden = true;
 
   // Preencher dados básicos
   clienteEl.textContent = item.cliente || "--";
@@ -64,22 +68,8 @@ function renderizarTela(item) {
   clienteActions.innerHTML = "";
 
   // ------------------------
-  // Cliente Agendada
-  if (item.status === "Agendado") {
-    contadorBox.innerHTML = `<strong style="font-size: 68px;">❤️</strong>`;
-    statusTitulo.textContent = "Seu horário está confirmado. Prepare-se para uma experiência incrível! 💅";
-    horarioBox.querySelector("span").textContent = "Horário agendado";
-    horarioEl.textContent = item.horarioEstimado || "--:--";
-
-    // Botões: Instagram e Reagendar
-    clienteActions.innerHTML = `
-      <button type="button" class="btn-instagram" onclick="abrirInstagram()">Instagram</button>
-      <button type="button" class="btn-reagendar" onclick="abrirGoogle()">Avaliar no Google</button>
-    `;
-  }
-  // ------------------------
   // Cliente Ausente
-  else if (item.status === "Ausente") {
+  if (item.status === "Ausente") {
     // Oculta info que não é relevante
     document.querySelector(".cliente-info").style.display = "none";
 
@@ -95,18 +85,40 @@ function renderizarTela(item) {
     `;
   }
   // ------------------------
+  // Cliente Agendada (o status operacional normalmente continua como Aguardando)
+  else if (item.tipoAtendimento === "Agendado" || item.status === "Agendado") {
+    const dataFormatada = formatarDataAtendimento(item.dataAtendimento || item.data_atendimento);
+    const horaFormatada = item.horaAtendimento || item.hora_atendimento || item.horarioEstimado || "Horário não informado";
+
+    contadorBox.classList.add("resumo-agendado");
+    contadorBox.innerHTML = `<span>Agendado para</span>
+      <strong>${dataFormatada || "Data não informada"}</strong>
+      <span>às ${horaFormatada}</span>`;
+    statusTitulo.textContent = "Seu horário está agendado.";
+    dataBox.hidden = false;
+    dataEl.textContent = dataFormatada || "Data não informada";
+    horarioBox.querySelector("span").textContent = "Horário do atendimento";
+    horarioEl.textContent = horaFormatada;
+    document.getElementById("textoCancelar").textContent = "Essa ação cancelará seu horário agendado. Deseja continuar?";
+
+    clienteActions.innerHTML = `
+      <button type="button" class="btn-reagendar" onclick="abrirModalReagendar()">Reagendar</button>
+      <button type="button" class="btn-cancelar" onclick="abrirModalCancelar()">Cancelar</button>
+    `;
+  }
+  // ------------------------
   // Fila de Espera
   else {
     const pessoas = item.pessoasNaFrente || 0;
+    contadorBox.classList.remove("resumo-agendado");
     contadorBox.style.display = "flex";
     contadorBox.innerHTML = `<strong style="font-size: 54px;">${pessoas}</strong>
                              <span>Pessoas à sua frente</span>`;
-    statusTitulo.textContent =
-      pessoas === 0
-        ? "Seu atendimento está próximo."
-        : "Acompanhe sua fila em tempo real.";
+    statusTitulo.textContent = "Você está na fila de espera. Acompanhe sua posição na fila.";
+    dataBox.hidden = true;
     horarioBox.querySelector("span").textContent = "Tempo restante";
     horarioEl.textContent = item.tempoRestante || "--:--";
+    document.getElementById("textoCancelar").textContent = "Essa ação retirará seu nome da fila. Deseja continuar?";
 
     // Botões Reagendar / Cancelar
     clienteActions.innerHTML = `
@@ -183,6 +195,15 @@ async function solicitarReagendamento(horario) {
 // Atualiza tela a cada 15s
 if (atendimentoId) {
   setInterval(carregarAtendimento, 15000);
+}
+
+function formatarDataAtendimento(valor) {
+  if (!valor) return "";
+  const texto = String(valor).trim();
+  const iso = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return `${iso[3]}/${iso[2]}/${iso[1]}`;
+  const br = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  return br ? `${br[1]}/${br[2]}/${br[3]}` : texto;
 }
 
 // Inicializa ao carregar a página
