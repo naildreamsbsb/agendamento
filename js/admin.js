@@ -82,6 +82,31 @@ function montarMensagemConfirmacao(atendimento, linkCliente) {
   return linhas.join("\n");
 }
 
+function montarMensagemAgradecimento(atendimento) {
+  return [
+    `Olá, ${atendimento.cliente}!`,
+    "Obrigada pela visita à Nail Dreams.",
+    "",
+    "Esperamos que você tenha gostado do seu atendimento.",
+    "",
+    "Você pode nos acompanhar no Instagram e deixar sua avaliação pelo link abaixo:",
+    montarLinkCliente(atendimento.id),
+    "",
+    `Serviço: ${atendimento.servico}`,
+    `Manicure: ${atendimento.manicure}`
+  ].join("\n");
+}
+
+function enviarAgradecimentoWhatsApp(atendimento) {
+  const link = montarLinkWhatsApp(atendimento.whatsapp, montarMensagemAgradecimento(atendimento));
+  if (!link) {
+    alert("Atendimento concluído, mas o WhatsApp da cliente não foi informado.");
+    return;
+  }
+
+  window.open(link, "_blank");
+}
+
 function normalizarDataInput(valor) {
   if (!valor) return "";
   const texto = String(valor).trim();
@@ -645,8 +670,29 @@ async function finalizarAtendimento(id, whatsapp, cliente, servico, botao) {
               return;
             }
 
-            document.getElementById('modalCaixa').remove();
             await carregarFila();
+
+            const atendimentoConcluido = {
+              id,
+              whatsapp: atendimento.whatsapp || whatsapp,
+              cliente: atendimento.cliente || cliente,
+              servico: atendimento.servico || servico,
+              manicure: atendimento.manicure || "Não informada"
+            };
+            const modalCaixa = document.getElementById('modalCaixa');
+            const modalCard = modalCaixa.querySelector('.modal-card');
+            modalCard.innerHTML = `
+              <h2>Atendimento concluído</h2>
+              <p>O atendimento e o caixa foram finalizados com sucesso.</p>
+              <div class="modal-actions modal-actions-full">
+                <button type="button" id="btnFecharConclusao">Fechar</button>
+                <button type="button" id="btnAgradecimento" class="btn-reagendar">Enviar agradecimento pelo WhatsApp</button>
+              </div>
+            `;
+            document.getElementById('btnFecharConclusao').addEventListener('click', () => modalCaixa.remove());
+            document.getElementById('btnAgradecimento').addEventListener('click', () => {
+              enviarAgradecimentoWhatsApp(atendimentoConcluido);
+            });
           } catch (erro) {
             console.error("Erro ao finalizar atendimento:", erro);
             alert("Não foi possível finalizar o atendimento agora. Tente novamente.");

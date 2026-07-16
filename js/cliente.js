@@ -4,6 +4,8 @@
 
 const params = new URLSearchParams(window.location.search);
 const atendimentoId = params.get("id");
+const INSTAGRAM_URL = "https://www.instagram.com/naildreams.bsb/";
+const GOOGLE_REVIEW_URL = "https://g.page/r/CQGUQrYpI28IEAI/review";
 
 let atendimentoAtual = null;
 
@@ -52,12 +54,19 @@ function renderizarTela(item) {
   const contadorBox = document.querySelector(".contador-box");
   const clienteActions = document.querySelector(".cliente-actions");
   const statusTitulo = document.getElementById("statusTitulo");
+  const statusComplemento = document.getElementById("statusComplemento");
   const horarioBox = horarioEl.closest("div");
   const dataBox = document.getElementById("dataAtendimentoBox");
   const dataEl = document.getElementById("dataAtendimento");
+  const clienteCard = document.querySelector(".cliente-card");
   document.querySelector(".cliente-info").style.display = "";
   contadorBox.classList.remove("resumo-agendado");
+  clienteCard.classList.remove("atendimento-agendado");
+  clienteCard.classList.remove("atendimento-concluido");
   dataBox.hidden = true;
+  horarioBox.hidden = false;
+  statusComplemento.hidden = true;
+  statusComplemento.textContent = "";
 
   // Preencher dados básicos
   clienteEl.textContent = item.cliente || "--";
@@ -68,8 +77,24 @@ function renderizarTela(item) {
   clienteActions.innerHTML = "";
 
   // ------------------------
+  // Atendimento concluído (fila ou agendado)
+  if (atendimentoConcluido(item.status)) {
+    clienteCard.classList.add("atendimento-concluido");
+    contadorBox.innerHTML = `<span>Atendimento</span><strong>Concluído</strong>`;
+    statusTitulo.textContent = "Obrigada pela visita!";
+    statusComplemento.textContent = "Seu atendimento foi concluído. Esperamos você novamente na Nail Dreams.";
+    statusComplemento.hidden = false;
+    dataBox.hidden = true;
+    horarioBox.hidden = true;
+
+    clienteActions.innerHTML = `
+      <button type="button" class="btn-instagram" onclick="abrirInstagram()">Instagram</button>
+      <button type="button" class="btn-google" onclick="abrirGoogle()">Avaliar no Google</button>
+    `;
+  }
+  // ------------------------
   // Cliente Ausente
-  if (item.status === "Ausente") {
+  else if (item.status === "Ausente") {
     // Oculta info que não é relevante
     document.querySelector(".cliente-info").style.display = "none";
 
@@ -91,14 +116,13 @@ function renderizarTela(item) {
     const horaFormatada = item.horaAtendimento || item.hora_atendimento || item.horarioEstimado || "Horário não informado";
 
     contadorBox.classList.add("resumo-agendado");
+    clienteCard.classList.add("atendimento-agendado");
     contadorBox.innerHTML = `<span>Agendado para</span>
       <strong>${dataFormatada || "Data não informada"}</strong>
       <span>às ${horaFormatada}</span>`;
     statusTitulo.textContent = "Seu horário está agendado.";
-    dataBox.hidden = false;
-    dataEl.textContent = dataFormatada || "Data não informada";
-    horarioBox.querySelector("span").textContent = "Horário do atendimento";
-    horarioEl.textContent = horaFormatada;
+    dataBox.hidden = true;
+    horarioBox.hidden = true;
     document.getElementById("textoCancelar").textContent = "Essa ação cancelará seu horário agendado. Deseja continuar?";
 
     clienteActions.innerHTML = `
@@ -137,11 +161,11 @@ function reagendarAusente(id) {
 }
 
 function abrirInstagram() {
-  window.open("https://www.instagram.com/naildreams.bsb/", "_blank");
+  window.open(INSTAGRAM_URL, "_blank", "noopener,noreferrer");
 }
 
 function abrirGoogle() {
-  window.open("https://g.page/r/CQGUQrYpI28IEAI/review", "_blank");
+  window.open(GOOGLE_REVIEW_URL, "_blank", "noopener,noreferrer");
 }
 
 // Funções Reagendar / Cancelar fila
@@ -195,6 +219,16 @@ async function solicitarReagendamento(horario) {
 // Atualiza tela a cada 15s
 if (atendimentoId) {
   setInterval(carregarAtendimento, 15000);
+}
+
+function atendimentoConcluido(status) {
+  const normalizado = String(status || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+
+  return ["finalizada", "finalizado", "concluido"].includes(normalizado);
 }
 
 function formatarDataAtendimento(valor) {
